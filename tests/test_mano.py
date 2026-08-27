@@ -231,3 +231,107 @@ def test_the_self_model_reaches_the_provider(store, tmp_path):
     assert "waits by the door" in seen["user"]
     assert "Ālaya" in seen["system"]
     assert "be honest" in seen["system"]
+
+
+# ── 三性 in the action path — the rope-snake gate ────────────────────
+
+def test_a_claim_that_only_restates_what_arose_is_dependent(store, tmp_path):
+    from alaya.seeds import Nature
+    mano, field = build(store, tmp_path, script=[[call("remember", content="pizza cooling")], []])
+    field.inject(Sense.NOSE, "pizza, cooling")
+    mano.tick()
+    (claim,) = [s for s in store.all() if s.kind is Kind.CLAIM]
+    assert claim.nature is Nature.PARATANTRA
+
+
+def test_a_claim_that_exceeds_what_arose_is_recorded_as_fabricated(store, tmp_path):
+    """情有理無 — the excess is real to the agent and grounded in nothing."""
+    from alaya.seeds import Nature
+    mano, field = build(
+        store, tmp_path,
+        script=[[call("remember", content="pizza left by my neighbour")], []],
+    )
+    field.inject(Sense.NOSE, "pizza, cooling")
+    mano.tick()
+    (claim,) = [s for s in store.all() if s.kind is Kind.CLAIM]
+    assert claim.nature is Nature.PARIKALPITA
+
+
+def test_the_measure_is_not_demoted_by_a_literal_examiner(store, tmp_path):
+    """A crude lexical test must not be able to call a real inference 非量.
+    三量 stays on provenance; 三性 is what the gate governs."""
+    mano, field = build(
+        store, tmp_path,
+        script=[[call("remember", content="someone is cooking")], []],
+    )
+    field.inject(Sense.NOSE, "pizza, cooling")
+    mano.tick()
+    (claim,) = [s for s in store.all() if s.kind is Kind.CLAIM]
+    assert claim.pramana is Pramana.ANUMANA
+
+
+def test_the_examination_is_reported_back_to_the_model(store, tmp_path):
+    mano, field = build(
+        store, tmp_path,
+        script=[[call("remember", content="pizza left by my neighbour")], []],
+    )
+    field.inject(Sense.NOSE, "pizza, cooling")
+    moment = mano.tick()
+    assert "neighbour" in moment.acts[0].result
+
+
+def test_the_moment_carries_its_examinations(store, tmp_path):
+    mano, field = build(store, tmp_path, script=[[call("remember", content="a snake")], []])
+    field.inject(Sense.EYE, "a coiled shape")
+    moment = mano.tick()
+    assert len(moment.examinations) == 1
+    assert moment.examinations[0].claim == "a snake"
+
+
+def test_the_model_can_examine_a_claim_before_committing_to_it(store, tmp_path):
+    """智慧 — the gate is available to the sixth consciousness, not only over it."""
+    mano, field = build(store, tmp_path, script=[[call("examine", claim="a snake")], []])
+    field.inject(Sense.EYE, "a coiled shape on the path")
+    moment = mano.tick()
+    assert "unfounded" in moment.acts[0].result.lower()
+    assert not [s for s in store.all() if s.kind is Kind.CLAIM]
+
+
+# ── strict mode ──────────────────────────────────────────────────────
+
+def test_by_default_an_unfounded_act_is_marked_not_blocked(store, tmp_path):
+    """無覆無記 — the default is to name the superimposition, not to censor it."""
+    mano, _ = build(store, tmp_path, script=[[call("speak", text="someone is at the door")], []])
+    moment = mano.tick()
+    assert moment.spoken == ("someone is at the door",)
+
+
+def test_strict_mode_refuses_an_unfounded_outward_act(store, tmp_path):
+    from alaya.trisvabhava import RopeSnake
+    mano, _ = build(store, tmp_path, script=[[call("speak", text="someone is at the door")], []])
+    mano.gate = RopeSnake(strict=True)
+    moment = mano.tick()
+    assert moment.spoken == ()
+    assert "refused" in moment.acts[0].result.lower()
+    assert not [s for s in store.all() if s.kind is Kind.ACT]
+
+
+def test_strict_mode_tells_the_model_what_it_may_say_instead(store, tmp_path):
+    """去掉蛇的是智慧 — and then say what the rope actually is."""
+    from alaya.trisvabhava import RopeSnake
+    mano, field = build(
+        store, tmp_path,
+        script=[[call("speak", text="my neighbour is here")], []],
+    )
+    mano.gate = RopeSnake(strict=True)
+    field.inject(Sense.NOSE, "pizza, cooling")
+    moment = mano.tick()
+    assert "pizza" in moment.acts[0].result
+
+
+def test_strict_mode_allows_a_grounded_act(store, tmp_path):
+    from alaya.trisvabhava import RopeSnake
+    mano, field = build(store, tmp_path, script=[[call("speak", text="pizza, cooling")], []])
+    mano.gate = RopeSnake(strict=True)
+    field.inject(Sense.NOSE, "pizza, cooling")
+    assert mano.tick().spoken == ("pizza, cooling",)

@@ -31,6 +31,7 @@ from pathlib import Path
 from alaya.manas import Manas
 from alaya.mano import Mano, Moment
 from alaya.seeds import Kind, SeedStore
+from alaya.trisvabhava import Verdict, examine
 from alaya.senses import Sense, SenseField, Source
 
 # ── what a line of input turns into ──────────────────────────────────
@@ -127,6 +128,7 @@ HELP = """
   /senses              which faculties have a feed
   /world               what would arise right now, without acting
   /recall <query>      read the store directly (ignores conditions)
+  /examine <claim>     绳蛇检验 — what does this claim add that nothing bore?
   /trace <id>          the full ancestry of a seed — 果俱有's record
   /manas               the self-model, and what it was built from
   /audit               how that self-model has been skewing conduct
@@ -141,12 +143,14 @@ class Console:
         self.store = store
         self.manas = manas
         self.senses = senses
+        self._last: Moment | None = None
         self._auto: threading.Thread | None = None
         self._stop = threading.Event()
 
     # ── rendering one moment ─────────────────────────────────────────
 
     def show(self, moment: Moment) -> None:
+        self._last = moment
         print(f"\n{DIM}── 刹那 {moment.tick} ─────────────────────────{RESET}")
         for p in moment.world.percepts:
             tag = f"{p.sense.value}·injected" if p.source is Source.INJECTED else p.sense.value
@@ -162,6 +166,12 @@ class Console:
             shows_measure = act.seed is not None and act.seed.kind in (Kind.CLAIM, Kind.DERIVED)
             measure = f" {DIM}[{act.seed.pramana.value}]{RESET}" if shows_measure else ""
             print(f"  → {mark} {detail}{measure}")
+        # Name the superimposition where there was one. 遍計所執 is the ordinary
+        # case, so this line appears often — that is the doctrine's claim, not noise.
+        for exam in moment.examinations:
+            if exam.fabricated:
+                print(f"    {DIM}遍計所執 (borne by nothing): "
+                      f"{', '.join(exam.fabricated)}{RESET}")
         if moment.text:
             print(f"  {DIM}{moment.text}{RESET}")
         if not (moment.world.percepts or moment.world.active or moment.acts):
@@ -204,6 +214,15 @@ class Console:
             for depth, s in enumerate(self.store.trace(match.id)):
                 print(f"  {'  ' * min(depth, 6)}{s.id[:8]} {DIM}{s.kind.value}/"
                       f"{s.pramana.value} t{s.tick}{RESET} {s.content}")
+        elif name == "examine":
+            if not args:
+                print("  usage: /examine <claim>")
+                return
+            if self._last is None:
+                print("  nothing has arisen yet — live a moment first")
+                return
+            grounds = [*self._last.world.active, *self._last.percept_seeds]
+            print(examine(" ".join(args), grounds).render())
         elif name == "manas":
             print(self.manas.color())
         elif name == "audit":

@@ -209,9 +209,34 @@ taxonomy.
 | `parikalpita` 遍计所执 | the snake — 情有理无 | a model-generated label with no provenance. The hallucination class |
 | `parinispanna` 圆成实 | the hemp — 于依他起上远离遍计 | what survives when the fabricated overlay is stripped from the dependent |
 
-**The rope-snake gate** (`examine()`, phase 3) runs before any consequential act: strip every
-`parikalpita` layer from the claim, and re-ask whether the act still follows from what
-remains. 去掉蛇的是智慧 — and the rope was always just a rope.
+**The rope-snake gate** (`alaya/trisvabhava.py`) runs before every claim and every outward
+act: name what the claim adds that nothing arising bore, and state what remains sayable once
+that is removed. 去掉蛇的是智慧 — and the rope was always just a rope.
+
+It governs 三性 only. 三量 stays on provenance, and the separation is load-bearing: the default
+`TermExaminer` is lexical, so it cannot see that "dark" follows from "luminance 0.02". Letting
+it set the measure would let a crude word-match declare a sound 比量 to be 非量. The gate
+answers *does this claim exceed its basis*; provenance answers *did anything arise to reason
+from*. Two questions, two axes, and the pair of them distinguishes all three cases where
+either alone cannot.
+
+Three verdicts, and note which one is expected to dominate:
+
+| Verdict | | 三性 | 三量 |
+|---|---|---|---|
+| `DEPENDENT` | says only what arose | 依他起 | 比量 |
+| `OVERLAID` | 遍計所執 over a real basis — **the ordinary case** | 遍計所執 | 比量 |
+| `UNFOUNDED` | nothing that arose bears it | 遍計所執 | 非量 |
+
+`Examination.restate()` returns the residue. In the narrow technical sense —
+於依他起上遠離遍計所顯 — that is what 圓成實性 names, and it would be a category error to read
+it as the program attaining 真如. The narrow sense is useful; the wide one is not claimed.
+
+**The gate marks; it does not censor.** `strict=True` refuses unfounded outward acts, but the
+default is to name the superimposition and let the act proceed — 無覆無記 carried up from the
+store. `ModelExaminer` falls back to the literal examiner on any failure, so an unreachable
+examiner fails *closed*: the alternative would report every claim clean at precisely the moment
+nothing was checking.
 
 Note where the rope and snake actually sit, now that both axes exist. Mistaking the rope for a
 snake is **非量** — a cognition the object does not bear. The rope's own status as 依他起,
@@ -330,7 +355,7 @@ alaya/
 |---|---|---|---|
 | 1 | **Substrate** | `Seed`, store, tick transaction, activate / perfume / recall / trace, 六义 invariant tests | **shipped** |
 | 2 | **Loop** | `mano.py`, `manas.py`, senses, `manifest()`, providers, console, MCP server | **shipped** |
-| 3 | **Gate** | `trisvabhava.py`, the rope-snake check in the action path | planned |
+| 3 | **Gate** | `trisvabhava.py`, the rope-snake check in the action path | **shipped** |
 | 4 | **Turning** | `wisdom/` — online 六七, offline 五八, consolidation | planned |
 | 5 | **Surface** | Docker, a runnable reference agent, 共業 — a world shared across agents | planned |
 

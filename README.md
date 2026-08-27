@@ -23,8 +23,9 @@ Four things the doctrine hands you that a folk model of memory does not:
   比量 (inferred), or 非量 (erroneous) — and an agent cannot rate its own certainty, so the
   measure is derived from what actually arose. A model may *downgrade* to doubt; it can never
   upgrade, and 現量 is not available to it at all. 前五識唯現量: naming is not perceiving.
-- **三性 → what a thing is, kept separate from how it was known.** 遍計所執 / 依他起 / 圓成實
-  is an ontology; 三量 is an epistemology. Conflating them is the most common way this
+- **三性 → the rope-snake gate.** Before an act, separate what actually arose (the rope) from
+  what the claim laid over it (the snake), and say what remains once the snake is removed.
+  三性 is an ontology and 三量 an epistemology; conflating them is the most common way this
   material gets misapplied, including by an earlier draft of this repo.
 - **六七因中轉，五八果上圓 → an improvement schedule.** The prompt and the self-model can be
   revised live from the agent's own trace; the sensors and the store need an offline rebuild.
@@ -42,11 +43,11 @@ rule carries the reason it takes the shape it does.
 |---|---|---|
 | 1 · Substrate | `Seed`, store, tick transaction, activate / perfume / recall / trace | **shipped** |
 | 2 · Loop | senses, `manifest()`, `mano`, `manas`, providers, console, MCP | **shipped** |
-| 3 · Gate | the rope-snake check in the action path | planned |
+| 3 · Gate | 绳蛇检验 — the rope-snake check in the action path | **shipped** |
 | 4 · Turning | 轉識成智 — online 六七, offline 五八 | planned |
 | 5 · Surface | Docker, a runnable reference agent, 共業 across agents | planned |
 
-**187 tests**, tests-first throughout.
+**217 tests**, tests-first throughout.
 
 ---
 
@@ -100,6 +101,48 @@ python -m alaya --provider claude        # ANTHROPIC_API_KEY
 python -m alaya --provider openai        # OPENAI_API_KEY
 python -m alaya --say --listen           # speak aloud; transcribe the microphone
 ```
+
+---
+
+## 绳蛇检验 — the rope-snake gate
+
+《攝大乘論》: in dim light you see a coiled rope and recoil from a snake. The claim is the
+snake; what actually arose is the rope; and the third nature is not a fourth thing behind
+the rope but the rope seen without the snake on it. 去掉蛇的是智慧 — 而繩始終是那條繩.
+
+```
+› /examine pizza left by my neighbour
+
+claim: pizza left by my neighbour
+verdict: overlaid (33% of it arose)
+遍計所執 (added by you, borne by nothing): left, neighbour
+依他起 (what actually arose): pizza
+without the addition, you have: pizza
+```
+
+The gate runs on every claim and every outward act. It sets the seed's 三性 — a claim that
+exceeds its basis is recorded 遍計所執 — while 三量 stays on provenance, because a lexical
+examiner must never be able to demote a genuine inference to 非量. Two axes, two questions.
+
+**Expect most claims to come back overlaid.** That is not the gate malfunctioning. 遍計所執 is
+the *ordinary* condition of unawakened cognition — the doctrine's claim is that superimposition
+is what ordinary knowing consists of, not an occasional lapse. A gate reporting clean most of
+the time would be the broken one. The signal is not "is there a snake" but "how much of this
+act rests on it".
+
+By default the gate **marks rather than blocks** — 無覆無記 carried up from the store, which
+never refuses what it is given. `--strict` refuses outward acts resting on nothing, and hands
+back the residue so the model can say the true smaller thing instead:
+
+```bash
+python -m alaya --strict
+```
+
+`TermExaminer` is the default: literal, deterministic, and deliberately blunt. It cannot see
+that "dark" follows from "luminance 0.02" and will over-report fabrication — the safe
+direction for a gate, since an examiner that guesses generously about what its grounds imply
+is one that launders fabrication. `ModelExaminer` judges implication instead, and falls back
+to the literal one on any failure so the gate fails closed rather than open.
 
 ---
 

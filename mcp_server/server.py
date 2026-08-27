@@ -24,6 +24,7 @@ So: one server, one store, one stream, with a tool per faculty.
     alaya_see / alaya_hear / alaya_smell / alaya_taste / alaya_touch
         place a percept into one sense (現量 — a signal, not a name)
     alaya_moment      live one 刹那 and report what arose and what was done
+    alaya_examine     绳蛇检验 — the rope-snake test on a claim
     alaya_recall      read the store directly, ignoring conditions
     alaya_trace       the full ancestry of a seed
     alaya_manas       the self-model and its bias audit
@@ -42,6 +43,7 @@ from alaya.mano import Mano
 from alaya.providers import build
 from alaya.seeds import SeedStore
 from alaya.senses import DormantFaculty, Ear, Eye, Sense, SenseField
+from alaya.trisvabhava import RopeSnake, examine as rope_snake
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -58,6 +60,11 @@ mano = Mano(
     manas=manas,
     identity=Identity.load(os.environ.get("ALAYA_IDENTITY", str(ROOT / "config" / "identity.yaml"))),
 )
+
+if os.environ.get("ALAYA_STRICT"):
+    mano.gate = RopeSnake(strict=True)
+
+_last = None  # the most recent moment, so a claim can be examined against it
 
 mcp = MCPServer("alaya", instructions=__doc__)
 
@@ -100,14 +107,31 @@ def alaya_touch(signal: str) -> str:
 @mcp.tool()
 def alaya_moment() -> str:
     """Live one 刹那: gather, manifest, deliberate, act, perfume. All or nothing."""
-    moment = mano.tick()
+    global _last
+    moment = _last = mano.tick()
     lines = [f"MOMENT {moment.tick}"]
     lines += [f"  arose: [{p.sense.value}] {p.signal}" for p in moment.world.percepts]
     lines += [f"  fired: {s.content} ({s.id[:8]})" for s in moment.world.active]
     for act in moment.acts:
         detail = act.seed.content if act.seed else act.result
         lines.append(f"  did:   {act.tool} — {detail}")
+    for exam in moment.examinations:
+        if exam.fabricated:
+            lines.append(f"  遍計所執: {', '.join(exam.fabricated)} (borne by nothing that arose)")
     return "\n".join(lines) if len(lines) > 1 else f"MOMENT {moment.tick} — nothing arose"
+
+
+@mcp.tool()
+def alaya_examine(claim: str) -> str:
+    """绳蛇检验 — name what this claim adds that nothing in the last moment bore.
+
+    去掉蛇的是智慧. Reports the 遍計所執 superimposition and what remains sayable
+    once it is removed. Records nothing.
+    """
+    if _last is None:
+        return "nothing has arisen yet — call alaya_moment first"
+    grounds = [*_last.world.active, *_last.percept_seeds]
+    return rope_snake(claim, grounds).render()
 
 
 @mcp.tool()

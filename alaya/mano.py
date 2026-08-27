@@ -51,6 +51,7 @@ from alaya.manifest import World, manifest
 from alaya.providers import Call, Provider, ToolSpec
 from alaya.seeds import Kind, Nature, Pramana, Seed, SeedStore, Tick, Valence
 from alaya.senses import Percept, SenseField
+from alaya.trisvabhava import Examination, RopeSnake, Verdict
 
 # ── 造業 — the act surface ───────────────────────────────────────────
 
@@ -92,6 +93,17 @@ TOOLS = [
             "required": ["conditions"]},
     ),
     ToolSpec(
+        name="examine",
+        description=(
+            "绳蛇检验 — run the rope-snake test on a claim before you commit to it. "
+            "Names what the claim adds that nothing arising this moment bears, and "
+            "tells you what remains sayable once that is removed. Costs nothing and "
+            "records nothing."
+        ),
+        schema={"type": "object", "properties": {"claim": {"type": "string"}},
+                "required": ["claim"]},
+    ),
+    ToolSpec(
         name="feel",
         description="Record how this moment sits with you. A reflection, not an outward act.",
         schema={"type": "object", "properties": {"mood": {"type": "string"}},
@@ -119,6 +131,7 @@ class Moment:
     percept_seeds: tuple[Seed, ...] = ()
     acts: tuple[Act, ...] = ()
     spoken: tuple[str, ...] = ()
+    examinations: tuple[Examination, ...] = ()
     text: str | None = None
 
 
@@ -131,6 +144,7 @@ class Mano:
         manas: Manas,
         identity: Identity,
         speaker: Callable[[str], None] | None = None,
+        gate: RopeSnake | None = None,
         max_rounds: int = 4,
     ):
         self.store = store
@@ -139,6 +153,9 @@ class Mano:
         self.manas = manas
         self.identity = identity
         self.speaker = speaker
+        # 绳蛇检验 in the action path. Default marks rather than blocks — see
+        # RopeSnake's docstring for why 無覆無記 is carried up this far.
+        self.gate = gate or RopeSnake()
         self.max_rounds = max_rounds
 
     # ── one moment ───────────────────────────────────────────────────
@@ -166,6 +183,7 @@ class Mano:
 
             acts: list[Act] = []
             spoken: list[str] = []
+            examinations: list[Examination] = []
             final_text: str | None = None
 
             messages = [{"role": "user", "content": self._user_prompt(world)}]
@@ -179,7 +197,7 @@ class Mano:
                 messages.append({"role": "assistant", "content": response.text or "",
                                  "calls": [c.name for c in response.calls]})
                 for c in response.calls:
-                    act = self._execute(t, c, grounds)
+                    act = self._execute(t, c, grounds, examinations)
                     acts.append(act)
                     if act.tool == "speak" and act.seed is not None:
                         spoken.append(act.seed.content)
@@ -192,6 +210,7 @@ class Mano:
             percept_seeds=percept_seeds,
             acts=tuple(acts),
             spoken=tuple(spoken),
+            examinations=tuple(examinations),
             text=final_text,
         )
 
@@ -226,37 +245,59 @@ class Mano:
 
     # ── 造業 — executing what the model decided ──────────────────────
 
-    def _execute(self, t: Tick, call: Call, grounds: list[Seed]) -> Act:
+    def _execute(self, t: Tick, call: Call, grounds: list[Seed],
+                 examinations: list[Examination]) -> Act:
         try:
-            return self._dispatch(t, call, grounds)
+            return self._dispatch(t, call, grounds, examinations)
         except Exception as exc:
             # A failed act is still something that happened. It is reported back
             # to the model in the same moment so it can respond to its own
             # failure rather than repeating it.
             return Act(tool=call.name, args=call.args, result=f"failed: {exc}")
 
-    def _dispatch(self, t: Tick, call: Call, grounds: list[Seed]) -> Act:
+    def _dispatch(self, t: Tick, call: Call, grounds: list[Seed],
+                  examinations: list[Examination]) -> Act:
         args = call.args or {}
         parents = [s.id for s in grounds]
 
         if call.name == "speak":
             text = args["text"]
+            # 绳蛇检验 before an outward act — the one place in the system where
+            # something may be refused, and only when the gate is strict.
+            exam = self.gate.examine(text, grounds)
+            examinations.append(exam)
+            if not self.gate.permits(exam):
+                return Act(call.name, args,
+                           f"refused — this act rests on nothing that arose.\n{exam.render()}")
             if self.speaker:
                 self.speaker(text)
             seed = t.perfume(content=text, kind=Kind.ACT, valence=Valence.NEUTRAL,
-                             nature=Nature.PARATANTRA, parents=parents)
+                             nature=exam.nature, parents=parents)
             return Act(call.name, args, "said", seed)
 
         if call.name == "remember":
+            exam = self.gate.examine(args["content"], grounds)
+            examinations.append(exam)
             seed = t.perfume(
                 content=args["content"],
                 kind=Kind.CLAIM,
                 valence=Valence(args.get("valence", "neutral")),
-                nature=Nature.PARATANTRA if grounds else Nature.PARIKALPITA,
+                # 三性 from the examination — does the claim exceed its basis?
+                nature=exam.nature,
+                # 三量 from provenance — did anything arise to reason from? These
+                # are different questions and a literal examiner must not be able
+                # to answer the second one.
                 pramana=self._measure(args.get("measure"), grounds),
                 parents=parents,
             )
-            return Act(call.name, args, f"remembered as {seed.pramana.value}", seed)
+            return Act(call.name, args,
+                       f"remembered as {seed.pramana.value}/{seed.nature.value}\n{exam.render()}",
+                       seed)
+
+        if call.name == "examine":
+            exam = self.gate.examine(args["claim"], grounds)
+            examinations.append(exam)
+            return Act(call.name, args, exam.render())
 
         if call.name == "recall":
             found = self.store.recall(args.get("query"), n=int(args.get("n", 5)))

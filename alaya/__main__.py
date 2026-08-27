@@ -19,6 +19,7 @@ from alaya.mano import Mano
 from alaya.providers import build
 from alaya.seeds import SeedStore
 from alaya.senses import DormantFaculty, Ear, Eye, Sense, SenseField
+from alaya.trisvabhava import RopeSnake
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -56,6 +57,8 @@ def main() -> None:
     ap.add_argument("--no-ear", action="store_true", help="no microphone")
     ap.add_argument("--listen", action="store_true", help="transcribe speech (OpenAI)")
     ap.add_argument("--say", action="store_true", help="speak aloud via macOS `say`")
+    ap.add_argument("--strict", action="store_true",
+                    help="绳蛇检验 refuses outward acts that rest on nothing that arose")
     args = ap.parse_args()
 
     store = SeedStore(args.store)
@@ -81,6 +84,7 @@ def main() -> None:
         manas=manas,
         identity=Identity.load(args.identity),
         speaker=say,
+        gate=RopeSnake(strict=args.strict),
     )
     Console(mano, store, manas, senses).run()
 
