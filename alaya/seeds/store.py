@@ -126,10 +126,17 @@ class SeedStore:
             matches = [s for s in matches if needle in s.content.lower()]
         return self._rank(matches, self.tick_count, n)
 
-    # ── 引自果 — provenance ───────────────────────────────────────────
+    # ── provenance — the causal record 果俱有 leaves behind ───────────
 
     def trace(self, seed_id: str) -> list[Seed]:
-        """The full ancestry of a seed, itself first. Every act is attributable."""
+        """The full ancestry of a seed, itself first. Every act is attributable.
+
+        This is not 引自果 (see ``perfume._check_determinacy`` for what that
+        criterion actually says). Traceability is what falls out of 果俱有:
+        because a cause must be *present* with its fruit, the tick can record
+        which seeds were there, and that record is never partial. So the walk
+        upward always terminates in percepts and never in a dangling id.
+        """
         seen: set[str] = set()
         order: list[Seed] = []
         queue = [seed_id]

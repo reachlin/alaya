@@ -1,1 +1,3 @@
-# phase 1 has no runtime dependencies beyond the standard library
+# Core — the seed store, the stream, and the console with injected senses.
+numpy>=1.24
+pyyaml>=6.0

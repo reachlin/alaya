@@ -1,0 +1,23 @@
+[project]
+name = "alaya"
+version = "0.2.0"
+description = "A memory-native AI agent architected as the eight consciousnesses of Yogācāra"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = ["numpy>=1.24", "pyyaml>=6.0"]
+
+[project.optional-dependencies]
+# 眼識 and 耳識 need devices. Without these the faculties are dormant and the
+# console still works by injection — 無心位 for those senses, not an error.
+senses = ["opencv-python>=4.8", "sounddevice>=0.4"]
+# The echo provider needs neither of these.
+providers = ["anthropic>=0.40", "openai>=1.40"]
+mcp = ["mcp>=2.0"]
+all = ["opencv-python>=4.8", "sounddevice>=0.4", "anthropic>=0.40", "openai>=1.40", "mcp>=2.0"]
+
+[project.scripts]
+alaya = "alaya.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["alaya*"]

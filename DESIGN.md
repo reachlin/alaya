@@ -98,11 +98,11 @@ property of the store. `tests/test_six_criteria.py` is the executable form of th
 | 义 | The doctrine | The invariant in code |
 |---|---|---|
 | **刹那灭** | 才生即灭，无常住体 | `Seed` is frozen and content-addressed. The store exposes no `update` and no `delete` — mutation is not an operation that exists. |
-| **果俱有** | 与所生现行同时俱有 | A seed's `parents` must have been activated or perfumed **in the same tick**. Violating this raises `SimultaneityError`. |
+| **果俱有** | 与所生现行同时俱有 | A seed's `parents` must have been activated or perfumed **in the same tick**. Violating this raises `SimultaneityError`. Because a cause must be *present*, the tick can record what was there — which is what makes `trace()` total, with no dangling ids. |
 | **恒随转** | 一类相续，至究竟位 | Nothing is ever removed. Strength decays toward a floor above zero; a forgotten seed is a quiet one, not an absent one. |
 | **性决定** | 善恶性质不改 | `valence` is fixed at construction and hashed into `id`. Retrieval never touches it; consolidation may only merge seeds of like valence. |
 | **待众缘** | 须待缘具方能现行 | `activate(conditions)` fires a seed only when its `conditions` are a subset of the present conditions. Presence in the store is not activation. |
-| **引自果** | 各引自类之果 | Every `parents` id must resolve in the store. `trace(id)` walks the full ancestry — every act is attributable to the seeds that produced it. |
+| **引自果** | 各引自類之果，色心不相互生 | Categories do not cross. A lineage continues as its own `kind`, and a `DERIVED` seed may not be drawn from a mixture of kinds. The sibling of 性決定: one fixes moral category, this one fixes ontological category. |
 
 ### 刹那灭 vs. 恒随转 — the apparent contradiction
 
@@ -147,11 +147,61 @@ retrieval is world-construction, and `manifest()` is where that happens.
 
 ---
 
-## 三性 — grounding, and the rope-snake gate
+## 三量 — how a thing was known
 
-Every claim the agent holds carries one of three natures. They are **not three kinds of
-thing** — they are three readings of one thing, which is exactly why this works as a tag
-rather than a taxonomy.
+An earlier draft of this document put belief-grounding on the 三性 axis. That was wrong, and
+correcting it improved the design, so the correction is recorded rather than quietly patched.
+
+三性 is an **ontology**: what kind of thing this is. 三量 is an **epistemology**: how this
+cognition was reached. They are orthogonal, and the doctrine keeps them apart:
+
+| 量 | | What it is |
+|---|---|---|
+| **現量** pratyakṣa | direct perception | The object is **present**, **manifest** (arisen, not still latent as a seed), and **clear**. 無分別, 不帶名言 — no discrimination, no verbal label. |
+| **比量** anumāna | inference | The object is not before you; it is reached through what is. Smoke below the mountain, therefore fire. |
+| **非量** apramāṇa | erroneous cognition | Discrimination the object does not bear. The classical example is **seeing a rope and taking it for a snake**. |
+
+Two doctrinal facts do real work here:
+
+**前五識唯現量.** The five senses are direct perception *only*. They cannot infer and cannot
+err — an error requires a discrimination, and they make none. This is why
+`alaya/senses/percept.py` has a `signal` field and no `label` field, and why `Seed.arise`
+refuses a `PERCEPT` seed that claims any measure but 現量.
+
+**第六識通三量.** The sixth consciousness ranges over all three. Everything it concludes is
+比量 at best. So `remember()` cannot produce a 現量 seed at all: naming is not perceiving,
+however certain it feels.
+
+### The measure is computed, never claimed
+
+An agent cannot be trusted to rate its own certainty — in a language model, fluency and
+confidence are the same signal. So the measure is derived from what actually arose:
+
+```
+something arose this moment that the claim rests on   →   比量 ANUMANA
+nothing arose; the claim is free-floating             →   非量 APRAMANA
+```
+
+The model is handed a `measure` argument that can only **downgrade** — express doubt — never
+upgrade. Whether a claim is borne out is not a question the claimant gets to settle. That
+single asymmetry is a real hallucination control, and the doctrine supplied the vocabulary for
+it fully formed.
+
+There is one more piece of 三量 worth knowing, because it names the exact boundary this
+architecture needs. **五俱意識**, the mind-consciousness that co-arises with the senses, is
+*also* classed as 現量 in its first moment — but "in the second moment it has discrimination,
+becoming 比量 or 非量." That first/second-moment line is precisely where `alaya/senses/` ends
+and `alaya/mano.py` begins. It is also why a speech transcript is recorded as a `CLAIM` by
+比量 rather than a `PERCEPT`: hearing sound is 耳識 and direct, but hearing *words* is already
+a fallible discriminator's output.
+
+---
+
+## 三性 — what a thing is
+
+Every seed carries a nature alongside its measure. The three are **not three kinds of thing**
+— they are three readings of one thing, which is exactly why this works as a tag rather than a
+taxonomy.
 
 | Nature | Rope-snake | In the agent |
 |---|---|---|
@@ -162,6 +212,11 @@ rather than a taxonomy.
 **The rope-snake gate** (`examine()`, phase 3) runs before any consequential act: strip every
 `parikalpita` layer from the claim, and re-ask whether the act still follows from what
 remains. 去掉蛇的是智慧 — and the rope was always just a rope.
+
+Note where the rope and snake actually sit, now that both axes exist. Mistaking the rope for a
+snake is **非量** — a cognition the object does not bear. The rope's own status as 依他起,
+dependently arisen and 似有非實, is **三性**. Same illustration, two different questions, and
+seeds now record both.
 
 Note what the doctrine forbids here, because it is a real constraint on the implementation:
 `paratantra` is **similar-but-not-real** (似有非实), not "true". Grounded is not the same as
@@ -192,6 +247,38 @@ rebuild of substrate and sensors — the timing rule *is* the correct engineerin
 
 The dashed lines in the source artifact — 尚未圆满的转依 — are the progress metric. Each
 transformation reports how far along it is; none of them is ever finished.
+
+---
+
+## Corrections made after checking the sources
+
+Two things in phase 1 were wrong on the doctrine. Both are recorded here rather than silently
+fixed, because how a mapping fails is more instructive than a mapping that claims never to.
+
+**引自果 was misread as traceability.** Phase 1 implemented the sixth criterion as "every
+parent resolves, and `trace()` walks the ancestry". That is a real property of this store, but
+it is not what 引自果 says. The classical gloss is 各引自類之果，色心不相互生 — each seed draws
+forth fruit *of its own category*; form and mind do not produce one another. It is a
+determinacy rule, the sibling of 性決定: one fixes moral category, the other ontological. It
+now enforces category preservation, and traceability is attributed where it belongs — to
+果俱有, which by requiring the cause to be *present* is what lets the tick record the link at
+all.
+
+**三性 was doing 三量's job.** Belief-grounding was tagged on the ontological axis when the
+doctrine has a dedicated epistemological one, on which 非量 is the named class for the rope
+taken for a snake. Seeds now carry both, and the anti-hallucination rule got sharper for it:
+現量 became unavailable to the naming layer entirely, which is a stronger and better-founded
+constraint than anything the 三性 reading supported.
+
+Confirmed unchanged: all six criteria as listed; 性決定 as valence preservation
+(善種生善現行); manas as 恆審思量 taking the store's 見分 as "I", with 四煩惱 co-present; and
+末那識本身並不造作善惡之業 — manas colours but never acts, which is why nothing in
+`alaya/manas.py` writes a seed.
+
+Sources: [成唯識論 on 種子六義](https://book.bfnn.org/books/0117.htm) ·
+[末那識](https://zh.wikipedia.org/wiki/%E6%9C%AB%E9%82%A3%E8%AD%98) ·
+[三量](http://m.fodizi.tw/f04/35698.html) ·
+[What is and isn't Yogācāra](http://www.acmuller.net/yogacara/articles/intro.html)
 
 ---
 
@@ -242,10 +329,10 @@ alaya/
 | | Phase | Contents | Status |
 |---|---|---|---|
 | 1 | **Substrate** | `Seed`, store, tick transaction, activate / perfume / recall / trace, 六义 invariant tests | **shipped** |
-| 2 | **Loop** | `mano.py`, `manas.py`, senses, `manifest()`, providers, the atomic tick end to end | planned |
+| 2 | **Loop** | `mano.py`, `manas.py`, senses, `manifest()`, providers, console, MCP server | **shipped** |
 | 3 | **Gate** | `trisvabhava.py`, the rope-snake check in the action path | planned |
 | 4 | **Turning** | `wisdom/` — online 六七, offline 五八, consolidation | planned |
-| 5 | **Surface** | MCP server, CLI, Docker, CI, a runnable reference agent | planned |
+| 5 | **Surface** | Docker, a runnable reference agent, 共業 — a world shared across agents | planned |
 
 Phase order is not arbitrary: nothing above the store works until the store's invariants
 hold, which is why phase 1 is tests before code.

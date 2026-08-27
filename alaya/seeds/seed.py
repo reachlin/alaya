@@ -30,6 +30,10 @@ class ValenceError(SeedError):
     """性决定 — fruit of a different nature than the seed that bore it."""
 
 
+class KindError(SeedError):
+    """引自果 — 色心不相互生: fruit of a category other than the seed's own."""
+
+
 class LineageError(SeedError):
     """自类相续 — a continuity claimed between things not of one kind."""
 
@@ -55,11 +59,25 @@ class Valence(str, Enum):
 
 
 class Nature(str, Enum):
-    """三性 — how this seed stands to what conditioned it."""
+    """三性 — an ontology. What kind of thing this is."""
 
-    PARATANTRA = "paratantra"        # 依他起 — dependently arisen; has provenance
+    PARATANTRA = "paratantra"        # 依他起 — dependently arisen; 似有非实
     PARIKALPITA = "parikalpita"      # 遍计所执 — fabricated; 情有理无
     PARINISPANNA = "parinispanna"    # 圆成实 — what remains when fabrication is stripped
+
+
+class Pramana(str, Enum):
+    """三量 — an epistemology. How this came to be known.
+
+    Orthogonal to :class:`Nature`. A dependently-arisen rope is 依他起 whether
+    or not the cognition of it is sound; whether *this* cognition is sound is
+    what 三量 answers. 非量 is the doctrine's own name for the rope taken for a
+    snake, which is why the erroneous class lives on this axis.
+    """
+
+    PRATYAKSA = "pratyaksa"    # 现量 — direct: present, manifest, undiscriminated
+    ANUMANA = "anumana"        # 比量 — inferred: reached through conditions
+    APRAMANA = "apramana"      # 非量 — erroneous: discrimination the object does not bear
 
 
 def _canonical(value: object) -> str:
@@ -76,6 +94,7 @@ class Seed:
     content: str
     valence: Valence
     nature: Nature
+    pramana: Pramana
     conditions: tuple[str, ...]
     parents: tuple[str, ...]
     weight: float
@@ -94,12 +113,19 @@ class Seed:
         content: str,
         valence: Valence,
         nature: Nature,
+        pramana: Pramana | None = None,
         conditions: Iterable[str] = (),
         parents: Iterable[str] = (),
         weight: float = 1.0,
         lineage: str | None = None,
     ) -> "Seed":
         kind, valence, nature = Kind(kind), Valence(valence), Nature(nature)
+        # 前五识唯现量 — the senses present and do not discriminate, so they can
+        # neither infer nor err. Everything else defaults to inference, being
+        # reached through conditions rather than borne directly.
+        if pramana is None:
+            pramana = Pramana.PRATYAKSA if kind is Kind.PERCEPT else Pramana.ANUMANA
+        pramana = Pramana(pramana)
         conditions = tuple(sorted({str(c) for c in conditions}))
         parents = tuple(str(p) for p in parents)
 
@@ -108,7 +134,12 @@ class Seed:
         if weight <= 0:
             raise SeedError(f"weight must be positive, got {weight!r}")
         if kind is Kind.DERIVED and not parents:
-            raise SeedError("引自果 — a derived seed with no parents is an effect without a cause")
+            raise SeedError("a derived seed with no parents is an effect without a cause")
+        if kind is Kind.PERCEPT and pramana is not Pramana.PRATYAKSA:
+            raise SeedError(
+                f"前五识唯现量 — a percept cannot be known by {pramana.value}; "
+                "naming what a signal is *of* is already the sixth consciousness"
+            )
 
         payload = {
             "tick": int(tick),
@@ -117,6 +148,7 @@ class Seed:
             "content": content,
             "valence": valence.value,
             "nature": nature.value,
+            "pramana": pramana.value,
             "conditions": list(conditions),
             "parents": list(parents),
             "weight": float(weight),
@@ -132,6 +164,7 @@ class Seed:
             content=content,
             valence=valence,
             nature=nature,
+            pramana=pramana,
             conditions=conditions,
             parents=parents,
             weight=float(weight),
@@ -151,6 +184,7 @@ class Seed:
         d["kind"] = self.kind.value
         d["valence"] = self.valence.value
         d["nature"] = self.nature.value
+        d["pramana"] = self.pramana.value
         d["conditions"] = list(self.conditions)
         d["parents"] = list(self.parents)
         return d
@@ -164,6 +198,7 @@ class Seed:
             content=d["content"],
             valence=Valence(d["valence"]),
             nature=Nature(d["nature"]),
+            pramana=Pramana(d.get("pramana", Pramana.ANUMANA.value)),
             conditions=tuple(d["conditions"]),
             parents=tuple(d["parents"]),
             weight=float(d["weight"]),
