@@ -35,13 +35,20 @@ for the doctrinal source ([唯识学纲要](https://claude.ai/code/artifact/dce8
 
 ## Status
 
-**Phase 1 — the substrate.** The seed store and its six invariants. Nothing above the store
-works until the store is right, so this is the whole of phase 1 and it was written
-tests-first.
+**Phase 1 — the substrate — is shipped.** The seed store and its six invariants, written
+tests-first: **67 tests**, of which 30 are the executable form of 種子六義. Nothing above the
+store works until the store is right, so the store is the whole of phase 1.
+
+```
+alaya/seeds/
+├── seed.py      Seed · Kind · Valence · Nature — frozen, content-addressed
+├── perfume.py   Tick — 三法展转，因果同时: activate and perfume in one transaction
+└── store.py     SeedStore — append-only, activate / recall / strength / trace
+```
 
 | Phase | Contents | Status |
 |---|---|---|
-| 1 · Substrate | `Seed`, store, tick transaction, activate / perfume / recall / trace | **current** |
+| 1 · Substrate | `Seed`, store, tick transaction, activate / perfume / recall / trace | **shipped** |
 | 2 · Loop | `mano.py`, `manas.py`, senses, `manifest()`, providers | planned |
 | 3 · Gate | 三性 tagging, the rope-snake check | planned |
 | 4 · Turning | 转识成智 — online 六七, offline 五八 | planned |

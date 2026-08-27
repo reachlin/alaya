@@ -241,7 +241,7 @@ alaya/
 
 | | Phase | Contents | Status |
 |---|---|---|---|
-| 1 | **Substrate** | `Seed`, store, tick transaction, activate / perfume / recall / trace, 六义 invariant tests | **in progress** |
+| 1 | **Substrate** | `Seed`, store, tick transaction, activate / perfume / recall / trace, 六义 invariant tests | **shipped** |
 | 2 | **Loop** | `mano.py`, `manas.py`, senses, `manifest()`, providers, the atomic tick end to end | planned |
 | 3 | **Gate** | `trisvabhava.py`, the rope-snake check in the action path | planned |
 | 4 | **Turning** | `wisdom/` — online 六七, offline 五八, consolidation | planned |
