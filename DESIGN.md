@@ -356,7 +356,7 @@ alaya/
 | 1 | **Substrate** | `Seed`, store, tick transaction, activate / perfume / recall / trace, 六义 invariant tests | **shipped** |
 | 2 | **Loop** | `mano.py`, `manas.py`, senses, `manifest()`, providers, console, MCP server | **shipped** |
 | 3 | **Gate** | `trisvabhava.py`, the rope-snake check in the action path | **shipped** |
-| 4 | **Turning** | `wisdom/` — online 六七, offline 五八, consolidation | planned |
+| 4 | **Turning** | `wisdom/` — online 六七, offline 五八, consolidation | **shipped** |
 | 5 | **Surface** | Docker, a runnable reference agent, 共業 — a world shared across agents | planned |
 
 Phase order is not arbitrary: nothing above the store works until the store's invariants

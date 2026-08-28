@@ -32,6 +32,7 @@ from alaya.manas import Manas
 from alaya.mano import Mano, Moment
 from alaya.seeds import Kind, SeedStore
 from alaya.trisvabhava import Verdict, examine
+from alaya.wisdom import Basis, Stage, UntimelyError, measure, turn
 from alaya.senses import Sense, SenseField, Source
 
 # ── what a line of input turns into ──────────────────────────────────
@@ -132,6 +133,9 @@ HELP = """
   /trace <id>          the full ancestry of a seed — 果俱有's record
   /manas               the self-model, and what it was built from
   /audit               how that self-model has been skewing conduct
+  /wisdom              轉識成智 — how far each transformation has come
+  /turn                因中轉 — turn the 6th and 7th now (cheap, online)
+  /turn fruit          果上圓 — turn the 5th and 8th (needs a settled store)
   /auto [secs]         let the stream run on its own    /stop to halt it
   /help  /quit
 """
@@ -223,6 +227,14 @@ class Console:
                 return
             grounds = [*self._last.world.active, *self._last.percept_seeds]
             print(examine(" ".join(args), grounds).render())
+        elif name == "wisdom":
+            print(measure(self._basis()).render())
+        elif name == "turn":
+            stage = Stage.FRUIT if args and args[0].lower().startswith("f") else Stage.CAUSE
+            try:
+                print(turn(self._basis(), stage=stage).render())
+            except UntimelyError as exc:
+                print(f"  {RED}untimely:{RESET} {exc}")
         elif name == "manas":
             print(self.manas.color())
         elif name == "audit":
@@ -233,6 +245,11 @@ class Console:
             self.stop_auto()
         else:
             print(f"  unknown command /{name} — try /help")
+
+    def _basis(self) -> Basis:
+        """所依 — what a turning may act on here."""
+        return Basis(store=self.store, manas=self.manas, senses=self.senses,
+                     directive=self.mano.directive, provider=self.mano.provider)
 
     # ── 恆轉如瀑流 — letting it run ──────────────────────────────────
 

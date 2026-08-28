@@ -27,8 +27,9 @@ Four things the doctrine hands you that a folk model of memory does not:
   what the claim laid over it (the snake), and say what remains once the snake is removed.
   三性 is an ontology and 三量 an epistemology; conflating them is the most common way this
   material gets misapplied, including by an earlier draft of this repo.
-- **六七因中轉，五八果上圓 → an improvement schedule.** The prompt and the self-model can be
-  revised live from the agent's own trace; the sensors and the store need an offline rebuild.
+- **六七因中轉，五八果上圓 → an improvement schedule that is enforced, not described.** The
+  prompt and self-model are revised live from the agent's own trace; the sensors and the store
+  need the stream stopped. A 果上圓 turning attempted mid-tick raises.
 
 Read **[DESIGN.md](DESIGN.md)** for the full mapping and **[docs/yogacara.md](docs/yogacara.md)**
 for the doctrinal source ([唯識學綱要](https://claude.ai/code/artifact/dce829ac-8adf-4cf2-919e-ec560cb00b60)).
@@ -44,10 +45,10 @@ rule carries the reason it takes the shape it does.
 | 1 · Substrate | `Seed`, store, tick transaction, activate / perfume / recall / trace | **shipped** |
 | 2 · Loop | senses, `manifest()`, `mano`, `manas`, providers, console, MCP | **shipped** |
 | 3 · Gate | 绳蛇检验 — the rope-snake check in the action path | **shipped** |
-| 4 · Turning | 轉識成智 — online 六七, offline 五八 | planned |
+| 4 · Turning | 轉識成智 — online 六七, offline 五八, consolidation | **shipped** |
 | 5 · Surface | Docker, a runnable reference agent, 共業 across agents | planned |
 
-**217 tests**, tests-first throughout.
+**267 tests**, tests-first throughout.
 
 ---
 
@@ -143,6 +144,54 @@ that "dark" follows from "luminance 0.02" and will over-report fabrication — t
 direction for a gate, since an examiner that guesses generously about what its grounds imply
 is one that launders fabrication. `ModelExaminer` judges implication instead, and falls back
 to the literal one on any failure so the gate fails closed rather than open.
+
+---
+
+## 轉識成智 — the turning
+
+Each consciousness becomes a wisdom. Not by being extinguished — 轉依 is a transformation of
+the *basis*, the same faculties no longer organised around 自我.
+
+```
+› /wisdom
+
+轉識成智 — all four
+  前五識      → 成所作智  ████████████ 100%  [果上圓]
+  第六意識     → 妙觀察智  ████████████ 100%  [因中轉]
+  第七末那識    → 平等性智  ████████┄┄┄┄  70%  [因中轉]
+  第八阿賴耶識   → 大圓鏡智  ████████┄┄┄┄  67%  [果上圓]
+      2 thing(s) said 4 times — the largest 2×: nose, pizza
+  ──────────────────────────────────────────
+  轉依 overall 84% — 尚未圓滿
+```
+
+The dashed lines are the point. No transformation is ever reported finished.
+
+**六七因中轉，五八果上圓** — they do not all turn together, and that timing rule is the most
+useful thing the doctrine says about self-improvement:
+
+| | Layer | When | What it does |
+|---|---|---|---|
+| **妙觀察智** | 6th | `/turn` — online, cheap | reads the gate's own verdicts and writes the standing directive the sixth consciousness reads next moment |
+| **平等性智** | 7th | `/turn` — online, cheap | measures how partial the self-model has become and appends a correction, leaving the account standing |
+| **成所作智** | 前五 | `/turn fruit` — offline | attribution per faculty; recalibrates the ear's threshold, reports the rest |
+| **大圓鏡智** | 8th | `/turn fruit` — offline | 種子生種子 — consolidates redundant arisings |
+
+The doctrine's reason is the engineer's reason: 分別 and 我執 are reachable by wisdom directly,
+so they can be revised while practice continues. The senses and the store cannot be corrected
+from inside their own operation. `/turn fruit` mid-tick raises `UntimelyError`.
+
+### Consolidation cannot be garbage collection
+
+The obvious way to handle fifty near-identical memories is to merge them and drop the rest.
+Both halves are forbidden here — 剎那滅 makes seeds unrewritable, 恆隨轉 unremovable. So
+consolidation is **additive**: a new abstraction is laid down carrying the *intersection* of
+its members' conditions, so it fires wherever any member would. Retrieval surfaces one thing
+instead of fifty, and nothing was lost.
+
+Then 果俱有 forces the elegant part. To cite the fifty as parents they must be *present*, so
+the consolidator opens a tick and activates them first: **you cannot abstract from memories you
+have not actually recalled.** Nobody designed that in — it falls out of the second criterion.
 
 ---
 

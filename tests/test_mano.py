@@ -335,3 +335,30 @@ def test_strict_mode_allows_a_grounded_act(store, tmp_path):
     mano.gate = RopeSnake(strict=True)
     field.inject(Sense.NOSE, "pizza, cooling")
     assert mano.tick().spoken == ("pizza, cooling",)
+
+
+# ── 妙觀察智's directive reaches the layer it was written for ────────
+
+def test_the_directive_reaches_the_prompt(store, tmp_path):
+    """因中轉 closes the loop only if the sixth consciousness actually reads it."""
+    from alaya.directive import Directive
+    seen = {}
+
+    class Watching(EchoProvider):
+        def converse(self, system, messages, tools):
+            seen["user"] = messages[0]["content"]
+            return Response(text="ok", calls=[])
+
+    directive = Directive(tmp_path / "directive.md")
+    directive.write("Call examine() before you remember anything.")
+    mano, _ = build(store, tmp_path)
+    mano.directive = directive
+    mano.provider = Watching()
+    mano.tick()
+    assert "Call examine() before you remember anything." in seen["user"]
+
+
+def test_an_agent_with_no_directive_still_lives(store, tmp_path):
+    mano, _ = build(store, tmp_path, script=[[]])
+    assert mano.directive is None
+    assert mano.tick().tick == 1

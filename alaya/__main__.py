@@ -13,6 +13,7 @@ import subprocess
 from pathlib import Path
 
 from alaya.console import Console
+from alaya.directive import Directive
 from alaya.identity import Identity
 from alaya.manas import Manas
 from alaya.mano import Mano
@@ -85,6 +86,7 @@ def main() -> None:
         identity=Identity.load(args.identity),
         speaker=say,
         gate=RopeSnake(strict=args.strict),
+        directive=Directive(Path(args.store).parent / "directive.md"),
     )
     Console(mano, store, manas, senses).run()
 

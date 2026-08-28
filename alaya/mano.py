@@ -45,6 +45,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Iterable
 
+from alaya.directive import Directive
 from alaya.identity import Identity
 from alaya.manas import Manas
 from alaya.manifest import World, manifest
@@ -145,6 +146,7 @@ class Mano:
         identity: Identity,
         speaker: Callable[[str], None] | None = None,
         gate: RopeSnake | None = None,
+        directive: Directive | None = None,
         max_rounds: int = 4,
     ):
         self.store = store
@@ -156,6 +158,9 @@ class Mano:
         # 绳蛇检验 in the action path. Default marks rather than blocks — see
         # RopeSnake's docstring for why 無覆無記 is carried up this far.
         self.gate = gate or RopeSnake()
+        # What 妙觀察智 wrote the last time the sixth consciousness turned.
+        # Without this the online transformation has nowhere to land.
+        self.directive = directive
         self.max_rounds = max_rounds
 
     # ── one moment ───────────────────────────────────────────────────
@@ -363,6 +368,14 @@ YOUR TOOLS
 Speak in {self.identity.language}."""
 
     def _user_prompt(self, world: World) -> str:
+        parts = [world.render()]
         # 恆審思量 — manas is in every prompt. No agent gets to skip its priors;
         # the most it can do is be shown them.
-        return f"{world.render()}\n\n{self.manas.color(world)}\n\nWhat do you do?"
+        parts.append(self.manas.color(world))
+        if self.directive is not None:
+            parts.append(
+                "STANDING DIRECTIVE (妙觀察智 — written by your own practice, from your "
+                f"own record):\n{self.directive.read()}"
+            )
+        parts.append("What do you do?")
+        return "\n\n".join(parts)

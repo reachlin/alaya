@@ -31,6 +31,7 @@ class SeedStore:
         self.halflife = float(halflife)
         self.floor = float(floor)
 
+        self._ticking = False
         self._seeds: list[Seed] = []
         self._by_id: dict[str, Seed] = {}
         self._by_lineage: dict[str, list[Seed]] = {}
@@ -43,6 +44,16 @@ class SeedStore:
         return Tick(self, self.tick_count + 1)
 
     @property
+    def ticking(self) -> bool:
+        """True while a moment is open and the store is mid-write.
+
+        The 果上圓 transformations consult this. 大圓鏡智 and 成所作智 cannot be
+        performed from inside the operation they are correcting — they need a
+        consistent view of the whole store, and mid-tick there is not one.
+        """
+        return self._ticking
+
+    @property
     def tick_count(self) -> int:
         """The last moment that left a trace. An empty tick leaves none."""
         return self._seeds[-1].tick if self._seeds else 0
@@ -51,6 +62,15 @@ class SeedStore:
 
     def all(self) -> tuple[Seed, ...]:
         return tuple(self._seeds)
+
+    def arisings(self) -> tuple[Seed, ...]:
+        """The present arising of every lineage — what can actually fire.
+
+        Superseded arisings are still in the store and still readable, but they
+        cannot be made present again, so nothing may cite them (果俱有). Any
+        process that needs to name what it worked from must work from here.
+        """
+        return tuple(self._current_arisings())
 
     def get(self, seed_id: str) -> Seed:
         return self._by_id[seed_id]

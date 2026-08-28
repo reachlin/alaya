@@ -29,6 +29,8 @@ So: one server, one store, one stream, with a tool per faculty.
     alaya_trace       the full ancestry of a seed
     alaya_manas       the self-model and its bias audit
     alaya_status      the state of the stream
+    alaya_wisdom      轉識成智 — how far each of the four transformations has come
+    alaya_turn        perform one stage of the turning (因中轉 or 果上圓)
 """
 from __future__ import annotations
 
@@ -43,7 +45,9 @@ from alaya.mano import Mano
 from alaya.providers import build
 from alaya.seeds import SeedStore
 from alaya.senses import DormantFaculty, Ear, Eye, Sense, SenseField
+from alaya.directive import Directive
 from alaya.trisvabhava import RopeSnake, examine as rope_snake
+from alaya.wisdom import Basis, Stage, UntimelyError, measure, turn
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -59,7 +63,13 @@ mano = Mano(
     senses=senses,
     manas=manas,
     identity=Identity.load(os.environ.get("ALAYA_IDENTITY", str(ROOT / "config" / "identity.yaml"))),
+    directive=Directive(Path(store.path).parent / "directive.md"),
 )
+
+
+def _basis() -> Basis:
+    return Basis(store=store, manas=manas, senses=senses,
+                 directive=mano.directive, provider=mano.provider)
 
 if os.environ.get("ALAYA_STRICT"):
     mano.gate = RopeSnake(strict=True)
@@ -159,6 +169,27 @@ def alaya_trace(seed_id: str) -> str:
 def alaya_manas() -> str:
     """第七末那識 — the self-model, and how much it has been bending conduct."""
     return f"{manas.color()}\n\n── audit ──\n{manas.audit().render()}"
+
+
+@mcp.tool()
+def alaya_wisdom() -> str:
+    """轉識成智 — how far each of the four transformations has come. Changes nothing."""
+    return measure(_basis()).render()
+
+
+@mcp.tool()
+def alaya_turn(stage: str = "cause") -> str:
+    """Perform one stage of 轉依.
+
+    stage="cause" (因中轉) turns the 6th and 7th — cheap, safe while running.
+    stage="fruit" (果上圓) turns the 5th and 8th — needs a settled store, so it
+    refuses if a moment is open.
+    """
+    wanted = Stage.FRUIT if stage.lower().startswith("f") else Stage.CAUSE
+    try:
+        return turn(_basis(), stage=wanted).render()
+    except UntimelyError as exc:
+        return f"untimely: {exc}"
 
 
 @mcp.tool()

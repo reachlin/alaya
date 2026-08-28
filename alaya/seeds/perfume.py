@@ -222,10 +222,12 @@ class Tick:
     # ── the transaction ──────────────────────────────────────────────
 
     def __enter__(self) -> "Tick":
+        self._store._ticking = True
         return self
 
     def __exit__(self, exc_type, exc, tb) -> bool:
         self._open = False
+        self._store._ticking = False
         if exc_type is None:
             self._store._commit(self._staged)
         self._staged.clear()
