@@ -160,8 +160,8 @@ def alaya_trace(seed_id: str) -> str:
     if match is None:
         return "no such seed"
     return "\n".join(
-        f"{'  ' * min(i, 6)}{s.id[:8]} [{s.kind.value}/{s.pramana.value} t{s.tick}] {s.content}"
-        for i, s in enumerate(store.trace(match.id))
+        f"{'  ' * min(depth, 8)}{s.id[:8]} [{s.kind.value}/{s.pramana.value} t{s.tick}] {s.content}"
+        for depth, s in store.ancestry(match.id)
     )
 
 

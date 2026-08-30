@@ -48,7 +48,7 @@ rule carries the reason it takes the shape it does.
 | 4 · Turning | 轉識成智 — online 六七, offline 五八, consolidation | **shipped** |
 | 5 · Surface | Docker, a runnable reference agent, 共業 across agents | planned |
 
-**267 tests**, tests-first throughout.
+**273 tests**, tests-first throughout.
 
 ---
 

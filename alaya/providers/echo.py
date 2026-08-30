@@ -22,6 +22,7 @@ _PERCEPT_LINE = re.compile(r"^\s*·\s*\[([^\]]+)\]\s*(.+)$", re.MULTILINE)
 
 class EchoProvider(Provider):
     name = "echo"
+    deliberative = False   # no model here; nothing may delegate judgement to it
 
     def __init__(self, script: list[list[Call]] | None = None):
         """``script`` drives deterministic behaviour in tests: one list of calls

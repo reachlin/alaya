@@ -215,8 +215,8 @@ class Console:
             if match is None:
                 print("  no such seed")
                 return
-            for depth, s in enumerate(self.store.trace(match.id)):
-                print(f"  {'  ' * min(depth, 6)}{s.id[:8]} {DIM}{s.kind.value}/"
+            for depth, s in self.store.ancestry(match.id):
+                print(f"  {'  ' * min(depth, 8)}{s.id[:8]} {DIM}{s.kind.value}/"
                       f"{s.pramana.value} t{s.tick}{RESET} {s.content}")
         elif name == "examine":
             if not args:

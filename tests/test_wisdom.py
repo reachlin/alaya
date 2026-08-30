@@ -341,3 +341,45 @@ def test_the_mirror_stops_counting_redundancy_it_has_already_answered(store, tmp
     after = Mirror().measure(basis)
     assert after.score > 0.9
     assert after.metrics["clusters"] == 0
+
+
+# ── not every provider can be asked to reflect ───────────────────────
+
+def test_a_stub_provider_is_never_asked_to_write_the_self_model(store, tmp_path):
+    """The echo provider has no language model behind it. Asking it for a
+    corrective and writing the reply into the self-model puts filler where the
+    agent's account of itself should be — which is worse than no correction,
+    because 恆審思量 carries it into every prompt afterwards."""
+    from alaya.providers import EchoProvider
+
+    with store.tick() as t:
+        for i in range(8):
+            t.perfume(content=f"I did this myself {i}", kind=Kind.ACT,
+                      valence=Valence.NEUTRAL, nature=Nature.PARATANTRA,
+                      conditions=("me",))
+    basis = basis_of(store, tmp_path)
+    basis.provider = EchoProvider()
+    Equality().turn(basis)
+    assert "echo" not in basis.manas.self_model.lower()
+    assert "partial" in basis.manas.self_model
+
+
+def test_a_deliberative_provider_is_asked(store, tmp_path):
+    from alaya.providers import Response
+
+    class Model:
+        name = "model"
+        deliberative = True
+
+        def converse(self, system, messages, tools):
+            return Response(text="You have been reading your own attention as character.")
+
+    with store.tick() as t:
+        for i in range(8):
+            t.perfume(content=f"I did this myself {i}", kind=Kind.ACT,
+                      valence=Valence.NEUTRAL, nature=Nature.PARATANTRA,
+                      conditions=("me",))
+    basis = basis_of(store, tmp_path)
+    basis.provider = Model()
+    Equality().turn(basis)
+    assert "reading your own attention as character" in basis.manas.self_model

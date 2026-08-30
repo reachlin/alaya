@@ -193,3 +193,11 @@ def test_the_examination_renders_for_a_human(store):
     text = examine("pizza left by my neighbour", g).render()
     assert "遍計所執" in text or "fabricated" in text.lower()
     assert "neighbour" in text
+
+
+def test_the_residue_stays_readable_when_much_arose(store):
+    """圓成實 is what remains *sayable*. A dump of forty grounds is not that."""
+    g = grounds(store, *[f"a distinct thing number {i} happened" for i in range(12)])
+    text = examine("a distinct thing happened, left by my neighbour", g).render()
+    assert "and 8 more" in text
+    assert text.count("distinct thing number") <= 8

@@ -37,6 +37,13 @@ class ToolSpec:
 class Provider(ABC):
     name = "provider"
 
+    #: Whether there is actually a language model behind this. The reflective
+    #: transformations (平等性智 asking for a corrective, ModelExaminer judging
+    #: implication) consult it before delegating judgement. A stub that answers
+    #: anyway does not fail loudly — it writes filler into the self-model, which
+    #: 恆審思量 then carries into every prompt afterwards.
+    deliberative = True
+
     @abstractmethod
     def converse(self, system: str, messages: list[dict], tools: list[ToolSpec]) -> Response:
         """One round. Return the tool calls the model wants, or text to finish."""

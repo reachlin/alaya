@@ -170,6 +170,30 @@ class SeedStore:
             queue.extend(seed.parents)
         return order
 
+    def ancestry(self, seed_id: str) -> list[tuple[int, Seed]]:
+        """``trace``, annotated with each seed's true distance from the effect.
+
+        ``trace`` returns a flat breadth-first list, which is the right shape
+        for asking *what went into this* but the wrong shape for drawing it: a
+        renderer that indents by position in the list invents a tree that is
+        not the causal graph. Depth here is the shortest path back from the
+        seed being traced, so a cause reached by two routes is shown as near as
+        its nearest route — which is what "how far back did this come from"
+        actually means.
+        """
+        seen: dict[str, int] = {}
+        order: list[tuple[int, Seed]] = []
+        queue: list[tuple[int, str]] = [(0, seed_id)]
+        while queue:
+            depth, current = queue.pop(0)
+            if current in seen or current not in self._by_id:
+                continue
+            seen[current] = depth
+            seed = self._by_id[current]
+            order.append((depth, seed))
+            queue.extend((depth + 1, p) for p in seed.parents)
+        return order
+
     # ── the single write path ────────────────────────────────────────
 
     def _commit(self, seeds: list[Seed]) -> None:

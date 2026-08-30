@@ -330,3 +330,45 @@ def test_every_act_is_attributable_to_the_seeds_that_produced_it(store):
             nature=Nature.PARATANTRA, parents=[s.id for s in active],
         )
     assert heard in store.trace(act.id)
+
+
+def test_ancestry_reports_true_causal_depth(store):
+    """A provenance display that misrepresents structure is worse than none.
+
+    ``trace`` is a flat list in breadth-first order; indenting by position in
+    that list draws a tree that is not the causal graph. ``ancestry`` carries
+    the real depth so a renderer cannot invent one.
+    """
+    with store.tick() as t:
+        root = percept(t, "a shared origin")
+        left = t.perfume(content="left", kind=Kind.CLAIM, valence=Valence.NEUTRAL,
+                         nature=Nature.PARATANTRA, parents=(root.id,))
+        right = t.perfume(content="right", kind=Kind.CLAIM, valence=Valence.NEUTRAL,
+                          nature=Nature.PARATANTRA, parents=(root.id,))
+        joined = t.perfume(content="both", kind=Kind.CLAIM, valence=Valence.NEUTRAL,
+                           nature=Nature.PARATANTRA, parents=(left.id, right.id))
+
+    depths = {seed.id: depth for depth, seed in store.ancestry(joined.id)}
+    assert depths[joined.id] == 0
+    assert depths[left.id] == depths[right.id] == 1
+    assert depths[root.id] == 2
+
+
+def test_ancestry_gives_a_shared_ancestor_its_shallowest_depth(store):
+    """A cause reached by two routes is as near as its nearest route."""
+    with store.tick() as t:
+        root = percept(t, "a shared origin")
+        mid = t.perfume(content="middle", kind=Kind.CLAIM, valence=Valence.NEUTRAL,
+                        nature=Nature.PARATANTRA, parents=(root.id,))
+        both = t.perfume(content="both", kind=Kind.CLAIM, valence=Valence.NEUTRAL,
+                         nature=Nature.PARATANTRA, parents=(root.id, mid.id))
+    depths = {seed.id: depth for depth, seed in store.ancestry(both.id)}
+    assert depths[root.id] == 1
+
+
+def test_ancestry_and_trace_cover_the_same_seeds(store):
+    with store.tick() as t:
+        a = percept(t, "footsteps")
+        b = t.perfume(content="someone is home", kind=Kind.CLAIM, valence=Valence.NEUTRAL,
+                      nature=Nature.PARATANTRA, parents=(a.id,))
+    assert [s for _, s in store.ancestry(b.id)] == store.trace(b.id)

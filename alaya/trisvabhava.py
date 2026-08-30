@@ -124,18 +124,27 @@ class Examination:
         """
         return Pramana.APRAMANA if self.verdict is Verdict.UNFOUNDED else Pramana.ANUMANA
 
+    #: Beyond this many grounds the residue stops being a restatement and starts
+    #: being a dump. 圓成實 is what remains *sayable*, so it has to stay sayable.
+    SHOWN = 4
+
     def restate(self) -> str:
         """圓成實 in the narrow sense — the dependent, with the addition removed."""
         if not self.dependent:
             return "nothing arose; there is nothing here to say"
-        return " / ".join(self.dependent)
+        shown = list(self.dependent[: self.SHOWN])
+        rest = len(self.dependent) - len(shown)
+        return " / ".join(shown) + (f" (and {rest} more)" if rest else "")
 
     def render(self) -> str:
         lines = [f"claim: {self.claim}", f"verdict: {self.verdict.value} ({self.support:.0%} of it arose)"]
         if self.fabricated:
             lines.append("遍計所執 (added by you, borne by nothing): " + ", ".join(self.fabricated))
         if self.dependent:
-            lines.append("依他起 (what actually arose): " + " / ".join(self.dependent))
+            shown = list(self.dependent[: self.SHOWN])
+            rest = len(self.dependent) - len(shown)
+            lines.append("依他起 (what actually arose): " + " / ".join(shown)
+                         + (f" (and {rest} more)" if rest else ""))
         lines.append("without the addition, you have: " + self.restate())
         if self.note:
             lines.append(f"note: {self.note}")
@@ -227,7 +236,7 @@ class ModelExaminer:
 
     def examine(self, claim: str, grounds: Sequence[Seed]) -> Examination:
         base = self.fallback.examine(claim, grounds)
-        if not grounds:
+        if not grounds or not getattr(self.provider, "deliberative", True):
             return base
 
         prompt = (

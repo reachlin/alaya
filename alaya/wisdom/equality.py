@@ -74,7 +74,7 @@ class Equality:
 
         base = basis.manas.self_model.split(MARK)[0].strip()
         correction = self._correction(progress.metrics)
-        if basis.provider is not None:
+        if basis.provider is not None and getattr(basis.provider, "deliberative", True):
             correction = self._ask(basis, base, progress) or correction
         basis.manas.revise(f"{base}\n\n{MARK}\n{correction}")
         return Progress(**{**progress.__dict__, "changed": True})
