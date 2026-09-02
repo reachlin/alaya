@@ -1,4 +1,10 @@
-"""OpenAI adapter. Also serves any OpenAI-compatible endpoint (Ollama, vLLM)."""
+"""OpenAI adapter — and, through ``base_url``, any OpenAI-compatible endpoint.
+
+DeepSeek, Ollama, vLLM, Together and most other providers speak this protocol,
+so one adapter covers nearly everything. What differs between them is only the
+endpoint, the default model, and which environment variable holds the key; see
+:func:`alaya.providers.build`.
+"""
 from __future__ import annotations
 
 import json
@@ -10,14 +16,20 @@ from alaya.providers.base import Call, Provider, Response, ToolSpec
 class OpenAIProvider(Provider):
     name = "openai"
 
-    def __init__(self, model: str = "gpt-4o", base_url: str | None = None):
+    def __init__(
+        self,
+        model: str = "gpt-4o",
+        base_url: str | None = None,
+        api_key_env: str | None = "OPENAI_API_KEY",
+        api_key: str | None = None,
+    ):
         from openai import OpenAI
 
         self.model = model
-        self._client = OpenAI(
-            api_key=os.environ.get("OPENAI_API_KEY", "none"),
-            base_url=base_url or os.environ.get("ALAYA_BASE_URL") or None,
-        )
+        self.base_url = base_url or os.environ.get("ALAYA_BASE_URL") or None
+        # A local endpoint needs no key; the SDK still wants a non-empty string.
+        key = api_key or (os.environ.get(api_key_env) if api_key_env else None) or "none"
+        self._client = OpenAI(api_key=key, base_url=self.base_url)
 
     def converse(self, system: str, messages: list[dict], tools: list[ToolSpec]) -> Response:
         response = self._client.chat.completions.create(

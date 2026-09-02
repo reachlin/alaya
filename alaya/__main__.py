@@ -1,7 +1,8 @@
 """``python -m alaya`` — start the stream with a console attached.
 
     python -m alaya                       offline: no API key, echo provider
-    python -m alaya --provider claude     a real sixth consciousness
+    python -m alaya --provider deepseek   a real sixth consciousness (DEEPSEEK_API_KEY)
+    python -m alaya --provider ollama     a local one — no key, nothing leaves the machine
     python -m alaya --no-eye --no-ear     injection only, no hardware
     python -m alaya --say                 speak aloud through macOS `say`
     python -m alaya --listen              transcribe the microphone (needs OpenAI key)
@@ -9,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 from pathlib import Path
 
@@ -49,10 +51,33 @@ def whisper_transcriber():
     return transcribe
 
 
+def _load_env(path: Path) -> None:
+    """Read KEY=value lines into the environment. Existing values win.
+
+    Deliberately not python-dotenv: this is six lines, and a credential loader
+    is a poor place to acquire a dependency.
+    """
+    if not path.exists():
+        raise SystemExit(f"no such env file: {path}")
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key, value = key.strip(), value.strip().strip("\"'")
+        if value and key not in os.environ:
+            os.environ[key] = value
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(prog="alaya", description="八識 — one stream, eight functions")
-    ap.add_argument("--provider", default="echo", choices=["echo", "claude", "openai"])
-    ap.add_argument("--model", default=None)
+    ap.add_argument("--provider", default="echo",
+                    choices=["echo", "claude", "openai", "deepseek", "ollama"])
+    ap.add_argument("--model", default=None, help="override the provider's default model")
+    ap.add_argument("--base-url", default=None,
+                    help="any OpenAI-compatible endpoint (vLLM, Together, a proxy)")
+    ap.add_argument("--env", default=None,
+                    help="load API keys from this .env file before starting")
     ap.add_argument("--store", default=str(ROOT / "data" / "seeds.jsonl"))
     ap.add_argument("--identity", default=str(ROOT / "config" / "identity.yaml"))
     ap.add_argument("--no-eye", action="store_true", help="no camera")
@@ -65,6 +90,9 @@ def main() -> None:
     ap.add_argument("--strict", action="store_true",
                     help="绳蛇检验 refuses outward acts that rest on nothing that arose")
     args = ap.parse_args()
+
+    if args.env:
+        _load_env(Path(args.env).expanduser())
 
     store = SeedStore(args.store)
     manas = Manas(store, path=Path(args.store).parent / "manas.md")
@@ -84,7 +112,7 @@ def main() -> None:
 
     mano = Mano(
         store=store,
-        provider=build(args.provider, args.model),
+        provider=build(args.provider, args.model, args.base_url),
         senses=senses,
         manas=manas,
         identity=Identity.load(args.identity),
