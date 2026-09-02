@@ -1,2 +1,4 @@
 -r requirements.txt
 pytest>=8.0
+# so CI exercises the provider adapters' wiring, not just our routing
+openai>=1.40
