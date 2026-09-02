@@ -12,6 +12,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
+from alaya.common import Commons
 from alaya.console import Console
 from alaya.directive import Directive
 from alaya.identity import Identity
@@ -58,6 +59,9 @@ def main() -> None:
     ap.add_argument("--no-ear", action="store_true", help="no microphone")
     ap.add_argument("--listen", action="store_true", help="transcribe speech (OpenAI)")
     ap.add_argument("--say", action="store_true", help="speak aloud via macOS `say`")
+    ap.add_argument("--commons", default=None,
+                    help="共業 — path to a shared world file two or more agents point at")
+    ap.add_argument("--name", default="alaya", help="this agent's name in the shared world")
     ap.add_argument("--strict", action="store_true",
                     help="绳蛇检验 refuses outward acts that rest on nothing that arose")
     args = ap.parse_args()
@@ -88,7 +92,8 @@ def main() -> None:
         gate=RopeSnake(strict=args.strict),
         directive=Directive(Path(args.store).parent / "directive.md"),
     )
-    Console(mano, store, manas, senses).run()
+    commons = Commons(args.commons) if args.commons else None
+    Console(mano, store, manas, senses, commons=commons, agent=args.name).run()
 
 
 if __name__ == "__main__":

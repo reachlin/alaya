@@ -28,6 +28,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from alaya.common import Commons
 from alaya.manas import Manas
 from alaya.mano import Mano, Moment
 from alaya.seeds import Kind, SeedStore
@@ -133,6 +134,10 @@ HELP = """
   /trace <id>          the full ancestry of a seed — 果俱有's record
   /manas               the self-model, and what it was built from
   /audit               how that self-model has been skewing conduct
+  /offer               共業 — publish your 共相種子 to the shared world
+  /receive             take up what other agents have offered (比量, never 現量)
+  /commons             what is in the shared world right now
+
   /wisdom              轉識成智 — how far each transformation has come
   /turn                因中轉 — turn the 6th and 7th now (cheap, online)
   /turn fruit          果上圓 — turn the 5th and 8th (needs a settled store)
@@ -142,11 +147,14 @@ HELP = """
 
 
 class Console:
-    def __init__(self, mano: Mano, store: SeedStore, manas: Manas, senses: SenseField):
+    def __init__(self, mano: Mano, store: SeedStore, manas: Manas, senses: SenseField,
+                 commons: Commons | None = None, agent: str = "alaya"):
         self.mano = mano
         self.store = store
         self.manas = manas
         self.senses = senses
+        self.commons = commons
+        self.agent = agent
         self._last: Moment | None = None
         self._auto: threading.Thread | None = None
         self._stop = threading.Event()
@@ -227,6 +235,24 @@ class Console:
                 return
             grounds = [*self._last.world.active, *self._last.percept_seeds]
             print(examine(" ".join(args), grounds).render())
+        elif name in ("offer", "receive", "commons"):
+            if self.commons is None:
+                print("  no shared world — start with --commons PATH --name NAME")
+                return
+            if name == "offer":
+                published = self.commons.offer(self.store, self.agent)
+                for o in published:
+                    print(f"  {GOLD}共{RESET} {o.content}")
+                print(f"  offered {len(published)}; 不共 (percepts, reflections) stayed home")
+            elif name == "receive":
+                taken = self.commons.receive(self.store, self.agent)
+                for s_ in taken:
+                    origin = next(c for c in s_.conditions if c.startswith("from:"))
+                    print(f"  {GOLD}共{RESET} {s_.content} {DIM}({origin}, 比量){RESET}")
+                print(f"  received {len(taken)} — none of it perceived, all of it on report")
+            else:
+                for o in self.commons.offerings():
+                    print(f"  {DIM}{o.origin:<10}{RESET} {o.content}")
         elif name == "wisdom":
             print(measure(self._basis()).render())
         elif name == "turn":

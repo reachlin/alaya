@@ -46,9 +46,9 @@ rule carries the reason it takes the shape it does.
 | 2 · Loop | senses, `manifest()`, `mano`, `manas`, providers, console, MCP | **shipped** |
 | 3 · Gate | 绳蛇检验 — the rope-snake check in the action path | **shipped** |
 | 4 · Turning | 轉識成智 — online 六七, offline 五八, consolidation | **shipped** |
-| 5 · Surface | Docker, a runnable reference agent, 共業 across agents | planned |
+| 5 · Surface | Docker, a runnable reference agent, 共業 across agents | **shipped** |
 
-**273 tests**, tests-first throughout.
+**294 tests**, tests-first throughout.
 
 ---
 
@@ -144,6 +144,70 @@ that "dark" follows from "luminance 0.02" and will over-report fabrication — t
 direction for a gate, since an examiner that guesses generously about what its grounds imply
 is one that launders fabrication. `ModelExaminer` judges implication instead, and falls back
 to the literal one on any failure so the gate fails closed rather than open.
+
+---
+
+## 共業 — why two agents see the same kitchen
+
+If everything is 唯識, why do you and I see the same river? 《唯識二十論》 treats this as one of
+the four hardest objections — 多人共見 — and does not answer by conceding an external river. It
+answers with **共業**: the 器世間 is 共變, collectively transformed, manifested congruently by
+beings whose karma is shared. That is the school's own defence against being read as solipsism,
+and an implementation without it leaves the architecture looking like private hallucination.
+
+```bash
+python examples/shared_world.py
+```
+
+Two agents. Nose has a nose; Ear has ears. Neither can perceive what the other perceives, and
+there is no world object anywhere in the program:
+
+```
+5 · What each agent actually has.
+  nose — nose.jsonl
+    c542d9a4 percept  現量  bread, baking
+    8b45db91 act      比量  my nose has something: bread, baking
+    661d3eea claim    比量  nose: bread, baking
+  ear — ear.jsonl
+    09560f71 claim    比量  my nose has something: bread, baking
+    fda67e37 claim    比量  nose: bread, baking
+```
+
+Ear knows about the bread and never smelled it — and its store says so, permanently, on the
+face of the seed.
+
+**There is no shared store, and there must not be.** The ālaya is *individual*; a universal
+mind is a different doctrine belonging to a different school, and conflating the two is one of
+the commonest errors with this material. What passes between agents is 共相種子 — content-
+addressed records that each agent perfumes into its own stream and manifests for itself
+(各自變現). The worlds look alike because the seeds are alike. That distinction is the whole
+doctrine, and it is also the better distributed design: no shared mutable state, only
+propagation of immutable records.
+
+| | |
+|---|---|
+| **不共 — never travels** | percepts and reflections. 根身 is 不共業所感, manifested by karma that is one's own alone. What your ear did cannot be handed to anyone; only what you made of it can. |
+| **共 — travels** | claims, derivations, acts |
+| **always 比量** | nothing another agent tells you is ever 現量. Dignāga folds testimony (聖教量) into inference, and a received seed is tagged that way forever. |
+
+One deliberate departure: fabrication does not travel by default. The doctrine would disagree —
+共業 explains shared *delusion* at least as well as shared rivers. But a system that gossips
+unfounded claims between agents manufactures consensus out of nothing, and consensus is exactly
+what an observer then mistakes for evidence. `Commons(path, only_borne=False)` restores the
+faithful behaviour, and is worth watching once.
+
+### In Docker
+
+```bash
+docker compose run --rm demo     # the reference agent, start to finish
+docker compose run --rm nose     # one agent's console   (/offer)
+docker compose run --rm ear      # the other's           (/receive)
+```
+
+The shared volume is a channel of 共相種子, not a store; each agent's ālaya is its own file.
+The image ships without eye and ear, because camera and microphone do not cross the Docker VM
+boundary on macOS and a faculty that claims to be present and then delivers nothing is worse
+than one that is honestly dormant.
 
 ---
 

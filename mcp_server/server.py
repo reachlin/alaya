@@ -29,6 +29,8 @@ So: one server, one store, one stream, with a tool per faculty.
     alaya_trace       the full ancestry of a seed
     alaya_manas       the self-model and its bias audit
     alaya_status      the state of the stream
+    alaya_offer       共業 — publish this agent's 共相種子 to a shared world
+    alaya_receive     take up what other agents offered (比量 — never 現量)
     alaya_wisdom      轉識成智 — how far each of the four transformations has come
     alaya_turn        perform one stage of the turning (因中轉 or 果上圓)
 """
@@ -45,6 +47,7 @@ from alaya.mano import Mano
 from alaya.providers import build
 from alaya.seeds import SeedStore
 from alaya.senses import DormantFaculty, Ear, Eye, Sense, SenseField
+from alaya.common import Commons
 from alaya.directive import Directive
 from alaya.trisvabhava import RopeSnake, examine as rope_snake
 from alaya.wisdom import Basis, Stage, UntimelyError, measure, turn
@@ -75,6 +78,9 @@ if os.environ.get("ALAYA_STRICT"):
     mano.gate = RopeSnake(strict=True)
 
 _last = None  # the most recent moment, so a claim can be examined against it
+
+AGENT = os.environ.get("ALAYA_NAME", "alaya")
+commons = Commons(os.environ["ALAYA_COMMONS"]) if os.environ.get("ALAYA_COMMONS") else None
 
 mcp = MCPServer("alaya", instructions=__doc__)
 
@@ -169,6 +175,33 @@ def alaya_trace(seed_id: str) -> str:
 def alaya_manas() -> str:
     """第七末那識 — the self-model, and how much it has been bending conduct."""
     return f"{manas.color()}\n\n── audit ──\n{manas.audit().render()}"
+
+
+@mcp.tool()
+def alaya_offer() -> str:
+    """共業 — publish this agent's shareable seeds to the common world.
+
+    Percepts and reflections never travel: 根身 is 不共業所感, manifested by
+    karma that is one's own alone. Fabricated claims are withheld by default.
+    """
+    if commons is None:
+        return "no shared world configured (set ALAYA_COMMONS)"
+    published = commons.offer(store, AGENT)
+    return "\n".join(f"共 {o.content}" for o in published) or "nothing new to offer"
+
+
+@mcp.tool()
+def alaya_receive() -> str:
+    """Take up what other agents have offered, as this agent's own seeds.
+
+    各自變現 — nothing is shared but the content; the seed made here is this
+    agent's own. Everything received is 比量: you did not perceive it, you infer
+    it from the fact that someone said so.
+    """
+    if commons is None:
+        return "no shared world configured (set ALAYA_COMMONS)"
+    taken = commons.receive(store, AGENT)
+    return "\n".join(f"共 {s.content} (比量)" for s in taken) or "nothing new"
 
 
 @mcp.tool()

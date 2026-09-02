@@ -1,0 +1,33 @@
+# 共業 — two agents, one shared world, two separate stores.
+#
+#   docker compose run --rm demo        the reference agent, start to finish
+#   docker compose run --rm nose        one agent's console  (/offer)
+#   docker compose run --rm ear         the other's          (/receive)
+#
+# `world` is the only volume they share, and it is a channel of 共相種子, not a
+# store. Each agent's ālaya is its own file under its own volume, because the
+# store is individual — a shared one would be a different doctrine entirely.
+
+services:
+  demo:
+    build: { context: ., dockerfile: docker/Dockerfile }
+    entrypoint: ["python", "examples/shared_world.py"]
+
+  nose:
+    build: { context: ., dockerfile: docker/Dockerfile }
+    command: ["--store", "/data/nose.jsonl", "--commons", "/world/world.jsonl", "--name", "nose"]
+    volumes: [nose-store:/data, world:/world]
+    stdin_open: true
+    tty: true
+
+  ear:
+    build: { context: ., dockerfile: docker/Dockerfile }
+    command: ["--store", "/data/ear.jsonl", "--commons", "/world/world.jsonl", "--name", "ear"]
+    volumes: [ear-store:/data, world:/world]
+    stdin_open: true
+    tty: true
+
+volumes:
+  nose-store:
+  ear-store:
+  world:
