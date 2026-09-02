@@ -31,6 +31,10 @@ Four things the doctrine hands you that a folk model of memory does not:
   prompt and self-model are revised live from the agent's own trace; the sensors and the store
   need the stream stopped. A 果上圓 turning attempted mid-tick raises.
 
+**[The architecture, drawn](https://claude.ai/code/artifact/9892afba-c6da-40ca-ab75-e84205d51024)**
+— four plates: the layers and their seed circuit, the tick as one transaction, the two grounding
+axes, the maturation schedule. Source in [`docs/architecture.html`](docs/architecture.html).
+
 Read **[DESIGN.md](DESIGN.md)** for the full mapping and **[docs/yogacara.md](docs/yogacara.md)**
 for the doctrinal source ([唯識學綱要](https://claude.ai/code/artifact/dce829ac-8adf-4cf2-919e-ec560cb00b60)).
 The code is written to be read: every module opens with what the doctrine says, and every

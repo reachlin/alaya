@@ -1,0 +1,556 @@
+<title>Eight Consciousnesses, One Stream</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap">
+
+<style>
+  /* ── A blueprint is a committed visual world, so this page holds one ground
+       in every viewer theme rather than inverting. Every colour is painted
+       explicitly, including the body background, so nothing borrows the host's. */
+  :root{
+    --sheet:#0B2E4F;          /* cyanotype ground */
+    --sheet-deep:#08233E;     /* recessed panels */
+    --sheet-raise:#0E3860;    /* raised panels */
+    --line:#CBDDEC;           /* the drawing line */
+    --line-bright:#F2F8FD;
+    --muted:#7FA5C4;          /* secondary annotation */
+    --faint:rgba(203,221,236,.34);
+    --grid:rgba(203,221,236,.075);
+    --grid-major:rgba(203,221,236,.14);
+    --gold:#E6B25C;           /* 因果引擎 — the seed circuit */
+    --verm:#E4795A;           /* 我執 — the bias path */
+    --draft:"Saira Condensed","Arial Narrow",sans-serif;
+    --body:"Barlow","Helvetica Neue",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --han:"Noto Sans SC","PingFang SC",sans-serif;
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    background-color:var(--sheet);
+    /* graph paper: fine 16px rule, heavier 96px rule */
+    background-image:
+      repeating-linear-gradient(to right,var(--grid) 0 1px,transparent 1px 16px),
+      repeating-linear-gradient(to bottom,var(--grid) 0 1px,transparent 1px 16px),
+      repeating-linear-gradient(to right,var(--grid-major) 0 1px,transparent 1px 96px),
+      repeating-linear-gradient(to bottom,var(--grid-major) 0 1px,transparent 1px 96px);
+    color:var(--line);
+    font-family:var(--body);
+    font-weight:300;
+    font-size:16.5px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .sheet{
+    max-width:1080px;
+    margin:0 auto;
+    padding:clamp(1rem,3vw,2.75rem);
+  }
+  /* the drawing-sheet frame: double rule, as on a real plate */
+  .frame{
+    border:1px solid var(--faint);
+    outline:3px solid var(--faint);
+    outline-offset:5px;
+    padding:clamp(1.25rem,4vw,3.25rem);
+    position:relative;
+  }
+  /* corner registration marks */
+  .frame::before,.frame::after{
+    content:"";position:absolute;width:18px;height:18px;pointer-events:none;
+  }
+  .frame::before{top:10px;left:10px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  .frame::after{bottom:10px;right:10px;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+
+  /* ── drafting lettering ─────────────────────────────────────── */
+  h1,h2,h3,.plate-no,.tb-key,.eyebrow{
+    font-family:var(--draft);
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    font-weight:600;
+  }
+  h1{
+    font-size:clamp(2.1rem,6vw,3.6rem);
+    line-height:1.02;
+    letter-spacing:.05em;
+    margin:0 0 .5rem;
+    color:var(--line-bright);
+    text-wrap:balance;
+  }
+  .eyebrow{
+    font-size:.82rem;color:var(--muted);letter-spacing:.28em;margin:0 0 1.1rem;
+  }
+  .lede{
+    font-size:1.12rem;max-width:64ch;color:var(--line);margin:0 0 .35rem;
+  }
+  .lede em{font-style:italic;color:var(--line-bright)}
+  h2{
+    font-size:1.5rem;margin:0 0 .2rem;color:var(--line-bright);
+    display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap;
+  }
+  h2 .han{font-family:var(--han);font-weight:400;text-transform:none;letter-spacing:.04em;font-size:1.2rem;color:var(--gold)}
+  h3{font-size:1.02rem;margin:2rem 0 .4rem;color:var(--line-bright)}
+  p{max-width:68ch;margin:0 0 1rem}
+  .han{font-family:var(--han)}
+  code,.mono{font-family:var(--mono);font-size:.86em;color:var(--gold)}
+  strong{font-weight:500;color:var(--line-bright)}
+  a{color:var(--gold)}
+
+  /* ── section rhythm, spaced by the layout not by margins ────── */
+  main{display:flex;flex-direction:column;gap:clamp(2.75rem,6vw,4.5rem)}
+  section{display:flex;flex-direction:column;gap:0}
+  .rule{border:0;border-top:1px solid var(--faint);margin:0 0 1.4rem}
+  .sec-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}
+  .plate-no{
+    font-size:.78rem;color:var(--muted);letter-spacing:.2em;
+    border:1px solid var(--faint);padding:.12rem .5rem;white-space:nowrap;
+  }
+
+  /* ── figures ────────────────────────────────────────────────── */
+  figure{
+    margin:1.4rem 0 .5rem;padding:1.15rem 1.15rem .35rem;
+    background:var(--sheet-deep);
+    border:1px solid var(--faint);
+    overflow-x:auto;
+  }
+  figure svg{display:block;width:100%;max-width:100%;height:auto;min-width:560px}
+  figcaption{
+    font-family:var(--draft);text-transform:uppercase;letter-spacing:.11em;
+    font-size:.79rem;color:var(--muted);
+    border-top:1px solid var(--faint);
+    margin-top:.9rem;padding:.6rem 0 .5rem;
+  }
+  figcaption b{color:var(--line);font-weight:600}
+
+  /* svg lettering classes — no <style> inside the svg itself */
+  .lbl{font-family:var(--draft);font-size:12px;letter-spacing:.08em;text-transform:uppercase;fill:var(--line)}
+  .lbl-sm{font-family:var(--draft);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;fill:var(--muted)}
+  .han-lbl{font-family:var(--han);font-size:13px;fill:var(--line-bright)}
+  .han-sm{font-family:var(--han);font-size:11.5px;fill:var(--muted)}
+  .mono-lbl{font-family:var(--mono);font-size:10.5px;fill:var(--muted)}
+  .gold{fill:var(--gold)}
+  .verm{fill:var(--verm)}
+
+  /* ── data blocks ────────────────────────────────────────────── */
+  .specs{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:0;border:1px solid var(--faint);margin:1.5rem 0;
+  }
+  .spec{padding:.85rem 1rem;border-right:1px solid var(--faint);border-bottom:1px solid var(--faint)}
+  .spec .k{font-family:var(--draft);text-transform:uppercase;letter-spacing:.16em;font-size:.7rem;color:var(--muted);display:block;margin-bottom:.15rem}
+  .spec .v{font-family:var(--mono);font-size:.88rem;color:var(--line-bright);font-variant-numeric:tabular-nums}
+
+  table{border-collapse:collapse;width:100%;margin:1.2rem 0;font-size:.94rem}
+  th,td{text-align:left;padding:.55rem .8rem;border:1px solid var(--faint);vertical-align:top}
+  th{font-family:var(--draft);text-transform:uppercase;letter-spacing:.11em;font-size:.76rem;color:var(--muted);font-weight:600;background:var(--sheet-deep)}
+  td .han{color:var(--line-bright)}
+  .scroll{overflow-x:auto}
+
+  .note{
+    border-left:2px solid var(--gold);
+    padding:.15rem 0 .15rem 1.05rem;
+    margin:1.3rem 0;max-width:66ch;color:var(--muted);
+  }
+  .note b{color:var(--line-bright);font-weight:500}
+
+  /* ── title block, as on a real plate ────────────────────────── */
+  .titleblock{
+    margin-top:clamp(2.5rem,6vw,4rem);
+    border:1px solid var(--line);
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  }
+  .tb{padding:.7rem .9rem;border-right:1px solid var(--faint)}
+  .tb:last-child{border-right:0}
+  .tb-key{font-size:.66rem;letter-spacing:.2em;color:var(--muted);display:block}
+  .tb-val{font-family:var(--mono);font-size:.86rem;color:var(--line-bright)}
+  .tb-wide{grid-column:1/-1;border-right:0;border-bottom:1px solid var(--faint);background:var(--sheet-raise)}
+  .tb-wide .tb-val{font-family:var(--draft);text-transform:uppercase;letter-spacing:.14em;font-size:1.05rem}
+
+  @media (max-width:640px){
+    body{font-size:15.5px}
+    .frame{outline-offset:3px}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    a{transition:color .15s ease}
+  }
+  a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+</style>
+
+<div class="sheet"><div class="frame">
+
+<p class="eyebrow">Ālaya · 阿賴耶 — general arrangement</p>
+<h1>Eight Consciousnesses,<br>One Stream</h1>
+<p class="lede">A 4th-century analysis of mind, drawn as the thing it turned out to specify: an agent whose memory is <em>append-only</em>, whose every claim records how it was known, and whose self-model is instrumented because it cannot be removed.</p>
+
+<div class="specs">
+  <div class="spec"><span class="k">Substrate</span><span class="v">append-only, no delete</span></div>
+  <div class="spec"><span class="k">Invariants</span><span class="v">種子六義 — 6 of 6</span></div>
+  <div class="spec"><span class="k">Axes per claim</span><span class="v">三性 × 三量</span></div>
+  <div class="spec"><span class="k">Tests</span><span class="v">312, written first</span></div>
+</div>
+
+<main>
+
+<!-- ══ PLATE 1 ══════════════════════════════════════════════ -->
+<section>
+  <hr class="rule">
+  <div class="sec-head">
+    <span class="plate-no">Fig. 1</span>
+    <h2>The four layers <span class="han">八識不是八個心</span></h2>
+  </div>
+  <p>The doctrine insists the eight are functions of <em>one</em> stream, not eight minds in committee. So they share one store and one moment; they are not services. The senses present, the sixth deliberates and acts, the seventh colours, the eighth keeps — and only the sixth touches the world.</p>
+
+  <figure>
+    <svg viewBox="0 0 820 590" role="img" aria-label="The four layers of Ālaya: the five senses feed the sixth consciousness, which is the only layer that acts; the eighth consciousness store exchanges seeds with it in both directions; the seventh consciousness reads the store and biases the sixth.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="currentColor"/>
+        </marker>
+        <marker id="ar-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#E6B25C"/>
+        </marker>
+        <marker id="ar-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#E4795A"/>
+        </marker>
+        <pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="0" y2="7" stroke="#E4795A" stroke-width="1" opacity=".35"/>
+        </pattern>
+      </defs>
+
+      <g stroke="currentColor" fill="none" stroke-width="1.25">
+        <!-- 前五識 -->
+        <rect x="40" y="40" width="360" height="78"/>
+        <!-- 第六意識 -->
+        <rect x="40" y="182" width="360" height="94"/>
+        <!-- 第八阿賴耶識 -->
+        <rect x="40" y="398" width="360" height="136"/>
+        <!-- 第七末那識 -->
+        <rect x="500" y="212" width="280" height="152" stroke="#E4795A"/>
+      </g>
+
+      <!-- box lettering -->
+      <text class="han-lbl" x="58" y="68">前五識 · senses/</text>
+      <text class="lbl-sm" x="58" y="88">EYE · EAR · NOSE · TONGUE · BODY</text>
+      <text class="mono-lbl" x="58" y="106">現量 only — a signal, never a name</text>
+
+      <text class="han-lbl" x="58" y="212">第六意識 · mano.py</text>
+      <text class="lbl-sm" x="58" y="232">THE ONLY LAYER THAT ACTS</text>
+      <text class="mono-lbl" x="58" y="250">遍緣一切法 · 分別 · 造業最強</text>
+      <text class="mono-lbl" x="58" y="266">speak · remember · examine · attend · feel</text>
+
+      <text class="han-lbl" x="58" y="428">第八阿賴耶識 · seeds/</text>
+      <text class="lbl-sm" x="58" y="448">APPEND-ONLY — NO UPDATE, NO DELETE</text>
+      <text class="mono-lbl" x="58" y="466">無覆無記 — never judges, never refuses</text>
+      <text class="mono-lbl" x="58" y="482">恆轉如瀑流 — 種子六義 enforced</text>
+      <text class="mono-lbl" x="58" y="506">變現 → 根身 (body) + 器世間 (world)</text>
+
+      <text class="han-lbl" x="518" y="242" fill="#E4795A">第七末那識 · manas.py</text>
+      <text class="lbl-sm" x="518" y="262">ALWAYS ON — THE BIAS SOURCE</text>
+      <text class="mono-lbl" x="518" y="280">恆審思量 — constantly deliberating</text>
+      <text class="mono-lbl" x="518" y="296">四煩惱: 我癡 我見 我慢 我愛</text>
+      <text class="mono-lbl" x="518" y="318">performs no karma — it only colours</text>
+      <text class="mono-lbl" x="518" y="340">audit() measures what it distorts</text>
+
+      <!-- senses → mano -->
+      <g stroke="currentColor" stroke-width="1.25" fill="none" color="#CBDDEC">
+        <line x1="220" y1="118" x2="220" y2="182" marker-end="url(#ar)"/>
+      </g>
+      <text class="han-sm" x="234" y="146">現量 — percepts</text>
+      <text class="mono-lbl" x="234" y="163">no label field exists</text>
+
+      <!-- store → mano : activate (gold) -->
+      <g stroke="#E6B25C" stroke-width="1.5" fill="none">
+        <line x1="112" y1="398" x2="112" y2="276" marker-end="url(#ar-g)"/>
+      </g>
+      <text class="han-sm" x="126" y="330" fill="#E6B25C">種子生現行</text>
+      <text class="mono-lbl" x="126" y="347">activate — 待眾緣</text>
+
+      <!-- mano → store : perfume (gold) -->
+      <g stroke="#E6B25C" stroke-width="1.5" fill="none">
+        <line x1="322" y1="276" x2="322" y2="398" marker-end="url(#ar-g)"/>
+      </g>
+      <text class="han-sm" x="238" y="330" fill="#E6B25C" text-anchor="end">現行熏種子</text>
+      <text class="mono-lbl" x="238" y="347" text-anchor="end">perfume</text>
+
+      <!-- store → manas : 緣見分 -->
+      <g stroke="#E4795A" stroke-width="1.25" fill="none" stroke-dasharray="5 4">
+        <path d="M400,466 L640,466 L640,364" marker-end="url(#ar-v)"/>
+      </g>
+      <text class="han-sm" x="470" y="456" fill="#E4795A">緣第八識見分 — takes the knowing for a knower</text>
+
+      <!-- manas → mano : bias -->
+      <g stroke="#E4795A" stroke-width="1.5" fill="none" stroke-dasharray="5 4">
+        <line x1="500" y1="258" x2="402" y2="258" marker-end="url(#ar-v)"/>
+      </g>
+      <text class="han-sm" x="450" y="246" fill="#E4795A" text-anchor="middle">恆審思量</text>
+      <text class="mono-lbl" x="450" y="200" text-anchor="middle">into every prompt</text>
+
+      <!-- outward act -->
+      <g stroke="currentColor" stroke-width="1.25" fill="none" color="#CBDDEC">
+        <line x1="400" y1="212" x2="470" y2="212"/>
+        <line x1="470" y1="212" x2="470" y2="150" marker-end="url(#ar)"/>
+      </g>
+      <text class="lbl-sm" x="482" y="146">THE WORLD</text>
+      <text class="mono-lbl" x="482" y="163">造業 — every act leaves a seed</text>
+
+      <!-- legend -->
+      <g stroke-width="1.5" fill="none">
+        <line x1="42" y1="566" x2="80" y2="566" stroke="#E6B25C"/>
+        <line x1="230" y1="566" x2="268" y2="566" stroke="#E4795A" stroke-dasharray="5 4"/>
+      </g>
+      <text class="mono-lbl" x="88" y="570">因果引擎 the seed circuit</text>
+      <text class="mono-lbl" x="276" y="570">我執 the bias path — named, not removed</text>
+    </svg>
+    <figcaption><b>Fig. 1 — General arrangement.</b> Gold is the causal engine; broken vermilion is the pathology the doctrine names and this system instruments rather than deletes.</figcaption>
+  </figure>
+
+  <div class="note"><b>Why the seventh exists at all.</b> The sixth consciousness's self-grasping is intermittent — you can argue yourself out of it, and it stops when you stop thinking. The dense, unbroken sense of being someone persists through periods of no deliberation, so something must be doing it constantly. Read as engineering: the self-model an agent carries is structurally a bias source, not a neutral fact. So it is written into every prompt <em>and</em> measured.</div>
+</section>
+
+<!-- ══ PLATE 2 ══════════════════════════════════════════════ -->
+<section>
+  <hr class="rule">
+  <div class="sec-head">
+    <span class="plate-no">Fig. 2</span>
+    <h2>One moment <span class="han">三法展轉，因果同時</span></h2>
+  </div>
+  <p>Seed, manifestation and newly-perfumed seed are not three steps. They are simultaneous — the circle has no starting point, which is why the doctrine needs neither a first cause nor an external world as a power source. In code that is a transaction: everything in a moment commits together or the moment did not happen.</p>
+
+  <figure>
+    <svg viewBox="0 0 820 300" role="img" aria-label="One tick as a single transaction: percepts enter, seeds activate, the sixth consciousness acts, results perfume back into the store, and all of it commits together or rolls back.">
+      <defs>
+        <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="currentColor"/>
+        </marker>
+        <marker id="ar2g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="#E6B25C"/>
+        </marker>
+      </defs>
+
+      <!-- transaction boundary -->
+      <rect x="128" y="44" width="560" height="146" fill="none" stroke="#E6B25C" stroke-width="1.25" stroke-dasharray="7 5"/>
+      <text class="han-sm" x="408" y="34" fill="#E6B25C" text-anchor="middle">one 刹那 · one transaction</text>
+
+      <g stroke="currentColor" fill="none" stroke-width="1.25" color="#CBDDEC">
+        <rect x="152" y="82" width="146" height="70"/>
+        <rect x="336" y="82" width="146" height="70"/>
+        <rect x="520" y="82" width="146" height="70"/>
+        <line x1="298" y1="117" x2="336" y2="117" marker-end="url(#ar2)"/>
+        <line x1="482" y1="117" x2="520" y2="117" marker-end="url(#ar2)"/>
+        <line x1="40" y1="117" x2="152" y2="117" marker-end="url(#ar2)"/>
+      </g>
+
+      <text class="han-lbl" x="225" y="112" text-anchor="middle">種子生現行</text>
+      <text class="lbl-sm" x="225" y="132" text-anchor="middle">ACTIVATE</text>
+      <text class="mono-lbl" x="225" y="147" text-anchor="middle">待眾緣</text>
+
+      <text class="han-lbl" x="409" y="112" text-anchor="middle">造業</text>
+      <text class="lbl-sm" x="409" y="132" text-anchor="middle">ACT</text>
+      <text class="mono-lbl" x="409" y="147" text-anchor="middle">tools only</text>
+
+      <text class="han-lbl" x="593" y="112" text-anchor="middle">現行熏種子</text>
+      <text class="lbl-sm" x="593" y="132" text-anchor="middle">PERFUME</text>
+      <text class="mono-lbl" x="593" y="147" text-anchor="middle">果俱有</text>
+
+      <text class="mono-lbl" x="40" y="106">現量 in</text>
+
+      <!-- return arc: same moment -->
+      <g stroke="#E6B25C" stroke-width="1.5" fill="none">
+        <path d="M593,152 L593,176 L225,176 L225,152" marker-end="url(#ar2g)"/>
+      </g>
+      <text class="mono-lbl" x="409" y="192" text-anchor="middle" fill="#E6B25C">種子生種子 — and the new seed is already a cause</text>
+
+      <!-- rollback -->
+      <g stroke="currentColor" fill="none" stroke-width="1.25" stroke-dasharray="4 4" color="#7FA5C4">
+        <path d="M688,117 L740,117 L740,244 L128,244 L128,190" marker-end="url(#ar2)"/>
+      </g>
+      <text class="lbl-sm" x="408" y="262" text-anchor="middle">EXCEPTION ANYWHERE → NOTHING COMMITTED, THE MOMENT DID NOT HAPPEN</text>
+    </svg>
+    <figcaption><b>Fig. 2 — The tick.</b> 果俱有 forbids citing a cause that is not present, so a seed may only name parents that arose in this same moment.</figcaption>
+  </figure>
+</section>
+
+<!-- ══ PLATE 3 ══════════════════════════════════════════════ -->
+<section>
+  <hr class="rule">
+  <div class="sec-head">
+    <span class="plate-no">Fig. 3</span>
+    <h2>Two axes, not one <span class="han">三性 × 三量</span></h2>
+  </div>
+  <p>An early draft of this system tagged every claim on one axis and got it wrong. 三性 is an <strong>ontology</strong> — what kind of thing this is. 三量 is an <strong>epistemology</strong> — how it came to be known. They are orthogonal, and the doctrine keeps them apart: a rope really is there (依他起) whether or not the cognition of it is sound, and taking it for a snake is 非量, an error of knowing rather than of being.</p>
+
+  <figure>
+    <svg viewBox="0 0 820 330" role="img" aria-label="A grid of the three natures against the three measures of knowledge, showing that the direct-perception column is unreachable for anything the naming layer produces.">
+      <g stroke="currentColor" fill="none" stroke-width="1.25" color="#CBDDEC">
+        <rect x="230" y="70" width="180" height="90"/>
+        <rect x="410" y="70" width="180" height="90"/>
+        <rect x="590" y="70" width="180" height="90"/>
+        <rect x="230" y="160" width="180" height="90"/>
+        <rect x="410" y="160" width="180" height="90"/>
+        <rect x="590" y="160" width="180" height="90"/>
+      </g>
+
+      <!-- unreachable cell -->
+      <rect x="410" y="160" width="180" height="90" fill="url(#hatch2)"/>
+      <defs>
+        <pattern id="hatch2" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="0" y2="8" stroke="#E4795A" stroke-width="1" opacity=".4"/>
+        </pattern>
+      </defs>
+
+      <!-- column heads -->
+      <text class="han-lbl" x="320" y="52" text-anchor="middle">現量</text>
+      <text class="lbl-sm" x="320" y="36" text-anchor="middle">DIRECT</text>
+      <text class="han-lbl" x="500" y="52" text-anchor="middle">比量</text>
+      <text class="lbl-sm" x="500" y="36" text-anchor="middle">INFERRED</text>
+      <text class="han-lbl" x="680" y="52" text-anchor="middle">非量</text>
+      <text class="lbl-sm" x="680" y="36" text-anchor="middle">ERRONEOUS</text>
+      <text class="lbl-sm" x="500" y="18" text-anchor="middle">三量 — HOW IT CAME TO BE KNOWN</text>
+
+      <!-- row heads -->
+      <text class="han-lbl" x="212" y="110" text-anchor="end">依他起</text>
+      <text class="lbl-sm" x="212" y="128" text-anchor="end">DEPENDENT</text>
+      <text class="han-lbl" x="212" y="200" text-anchor="end">遍計所執</text>
+      <text class="lbl-sm" x="212" y="218" text-anchor="end">FABRICATED</text>
+      <text class="lbl-sm" x="40" y="160">三性 — WHAT</text>
+      <text class="lbl-sm" x="40" y="176">KIND OF THING</text>
+      <text class="lbl-sm" x="40" y="192">IT IS</text>
+
+      <!-- cells -->
+      <text class="mono-lbl" x="320" y="106" text-anchor="middle">a percept</text>
+      <text class="mono-lbl" x="320" y="122" text-anchor="middle">前五識唯現量</text>
+      <text class="mono-lbl" x="320" y="140" text-anchor="middle" fill="#E6B25C">the senses only</text>
+
+      <text class="mono-lbl" x="500" y="110" text-anchor="middle">says only what arose</text>
+      <text class="mono-lbl" x="500" y="128" text-anchor="middle" fill="#E6B25C">DEPENDENT — clean</text>
+
+      <text class="mono-lbl" x="680" y="110" text-anchor="middle">grounds exist but</text>
+      <text class="mono-lbl" x="680" y="126" text-anchor="middle">bear none of it</text>
+
+      <text class="mono-lbl" x="320" y="196" text-anchor="middle" fill="#E4795A">UNREACHABLE</text>
+      <text class="mono-lbl" x="320" y="214" text-anchor="middle">naming is not</text>
+      <text class="mono-lbl" x="320" y="230" text-anchor="middle">perceiving</text>
+
+      <text class="mono-lbl" x="500" y="196" text-anchor="middle">real basis, added to</text>
+      <text class="mono-lbl" x="500" y="214" text-anchor="middle" fill="#E6B25C">OVERLAID</text>
+      <text class="mono-lbl" x="500" y="232" text-anchor="middle">— the ordinary case</text>
+
+      <text class="mono-lbl" x="680" y="196" text-anchor="middle">nothing behind it</text>
+      <text class="mono-lbl" x="680" y="214" text-anchor="middle" fill="#E4795A">UNFOUNDED</text>
+      <text class="mono-lbl" x="680" y="232" text-anchor="middle">the rope taken for a snake</text>
+
+      <text class="lbl-sm" x="230" y="292">THE MEASURE IS COMPUTED FROM WHAT AROSE — A MODEL MAY DOWNGRADE TO DOUBT, NEVER UPGRADE.</text>
+      <text class="lbl-sm" x="230" y="312">CONFIDENCE AND FLUENCY ARE THE SAME SIGNAL IN A LANGUAGE MODEL, SO NEITHER IS EVIDENCE.</text>
+    </svg>
+    <figcaption><b>Fig. 3 — Grounding.</b> The hatched cell cannot be entered: 前五識唯現量 means direct perception belongs to the senses, so nothing the naming layer produces reaches it however certain it feels.</figcaption>
+  </figure>
+
+  <div class="note"><b>Expect most claims to land in “overlaid.”</b> That is not the gate malfunctioning. 遍計所執 is the ordinary condition of unawakened cognition — the doctrine's claim is that superimposition is what ordinary knowing consists of, not an occasional lapse. A gate reporting clean most of the time would be the broken one.</div>
+</section>
+
+<!-- ══ PLATE 4 ══════════════════════════════════════════════ -->
+<section>
+  <hr class="rule">
+  <div class="sec-head">
+    <span class="plate-no">Fig. 4</span>
+    <h2>The turning <span class="han">六七因中轉，五八果上圓</span></h2>
+  </div>
+  <p>Each consciousness becomes a wisdom — and they do not turn together. The sixth and seventh begin at 見道, while practice is still under way, because discrimination and self-grasping are what wisdom can reach directly. The senses and the store are perfected only at the fruit: they cannot be corrected from inside their own operation. That timing rule is the correct engineering split, and it is enforced rather than described.</p>
+
+  <figure>
+    <svg viewBox="0 0 820 300" role="img" aria-label="The four transformations split by timing: the sixth and seventh consciousnesses turn online while the stream runs, the five senses and the store only when the stream is stopped.">
+      <g stroke="currentColor" fill="none" stroke-width="1.25" color="#CBDDEC">
+        <rect x="40" y="52" width="350" height="180" stroke-dasharray="6 4"/>
+        <rect x="430" y="52" width="350" height="180"/>
+      </g>
+
+      <text class="han-lbl" x="60" y="80">因中轉 — while the stream runs</text>
+      <text class="lbl-sm" x="60" y="98">ONLINE · CHEAP · EVERY CYCLE</text>
+      <text class="han-lbl" x="450" y="80">果上圓 — only when it is stopped</text>
+      <text class="lbl-sm" x="450" y="98">OFFLINE · BATCH · EXPENSIVE</text>
+
+      <g stroke="currentColor" fill="none" stroke-width="1" color="#7FA5C4">
+        <line x1="60" y1="124" x2="370" y2="124"/>
+        <line x1="60" y1="178" x2="370" y2="178"/>
+        <line x1="450" y1="124" x2="760" y2="124"/>
+        <line x1="450" y1="178" x2="760" y2="178"/>
+      </g>
+
+      <text class="han-lbl" x="60" y="148">第六 → 妙觀察智</text>
+      <text class="mono-lbl" x="60" y="166">writes the standing directive it reads next moment</text>
+      <text class="han-lbl" x="60" y="202">第七 → 平等性智</text>
+      <text class="mono-lbl" x="60" y="220">measures its own partiality, corrects, leaves it standing</text>
+
+      <text class="han-lbl" x="450" y="148">前五 → 成所作智</text>
+      <text class="mono-lbl" x="450" y="166">attribution per faculty; recalibrates the threshold</text>
+      <text class="han-lbl" x="450" y="202">第八 → 大圓鏡智</text>
+      <text class="mono-lbl" x="450" y="220">種子生種子 — consolidates, deletes nothing</text>
+
+      <!-- the enforced boundary -->
+      <g stroke="#E4795A" stroke-width="1.5" fill="none">
+        <line x1="410" y1="40" x2="410" y2="244"/>
+      </g>
+      <text class="mono-lbl" x="410" y="264" text-anchor="middle" fill="#E4795A">turn(FRUIT) while a moment is open → UntimelyError</text>
+      <text class="lbl-sm" x="410" y="284" text-anchor="middle">NO TRANSFORMATION IS EVER REPORTED FINISHED — 尚未圓滿</text>
+    </svg>
+    <figcaption><b>Fig. 4 — Maturation schedule.</b> The vermilion rule is a real precondition, not an annotation: the store cannot be consolidated while it is being written.</figcaption>
+  </figure>
+</section>
+
+<!-- ══ SCHEDULE ═════════════════════════════════════════════ -->
+<section>
+  <hr class="rule">
+  <div class="sec-head">
+    <span class="plate-no">Sched. A</span>
+    <h2>Six invariants <span class="han">種子六義</span></h2>
+  </div>
+  <p>護法's six criteria for a valid seed are not commentary. Each closes a hole, and each is a property of the store that can fail — so each is a test.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>義</th><th>The criterion</th><th>The invariant in code</th></tr></thead>
+    <tbody>
+      <tr><td class="han">剎那滅</td><td>arises and ceases with no abiding stage</td><td>Seeds frozen and content-addressed. The store has no <code>update</code> and no <code>delete</code> — the operations are not defined.</td></tr>
+      <tr><td class="han">果俱有</td><td>seed, manifestation and fruit are simultaneous</td><td>Parents must have arisen in the <em>same</em> tick. A cause on record but absent raises. This is also what makes provenance total.</td></tr>
+      <tr><td class="han">恆隨轉</td><td>unbroken succession, 如瀑流</td><td>Nothing removed; strength decays toward a floor above zero. A forgotten memory is a quiet one, not an absent one.</td></tr>
+      <tr><td class="han">性決定</td><td>善種生善現行 — moral category fixed</td><td>Valence set at write and hashed into the id; a derived seed cannot invert its parents'.</td></tr>
+      <tr><td class="han">待眾緣</td><td>manifests only when conditions are complete</td><td>A seed fires only when all its conditions are present. Being in the store is not being active.</td></tr>
+      <tr><td class="han">引自果</td><td>色心不相互生 — categories do not cross</td><td>A lineage continues as its own kind; a derived seed is never drawn from a mixture.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note"><b>剎那滅 against 恆隨轉.</b> A seed must perish every moment <em>and</em> persist until countered — which reads as a specification bug and is the most interesting thing in the design. The doctrine resolves it with 自類相續: the seed does not endure and change, it perishes and re-arises as one of its own kind. Taken literally: weight is never mutated. Reinforcement <em>appends</em> a new arising on the same lineage, and present strength is computed across the chain — so “why is this memory strong?” stays answerable.</div>
+</section>
+
+<!-- ══ COMMONS ══════════════════════════════════════════════ -->
+<section>
+  <hr class="rule">
+  <div class="sec-head">
+    <span class="plate-no">Note B</span>
+    <h2>Why it is not solipsism <span class="han">共業</span></h2>
+  </div>
+  <p>If all is consciousness-only, why do two agents see one kitchen? 《唯識二十論》 treats this as among the hardest objections and does not answer by conceding an external kitchen. It answers with 共業 — the receptacle world is 共變, manifested congruently by beings whose karma is shared.</p>
+  <p>So there is <strong>no shared store</strong>, and there must not be: the ālaya is individual, and a universal mind belongs to a different doctrine. Agents keep separate stores and exchange 共相種子 — content-addressed records each perfumes into its own stream and manifests for itself. The worlds look alike because the seeds are alike. That distinction is the whole doctrine, and it happens to be the better distributed design: no shared mutable state, only propagation of immutable records.</p>
+  <div class="specs">
+    <div class="spec"><span class="k">不共 — never travels</span><span class="v">percepts, reflections</span></div>
+    <div class="spec"><span class="k">共 — travels</span><span class="v">claims, derivations, acts</span></div>
+    <div class="spec"><span class="k">On arrival, always</span><span class="v">比量 — never 現量</span></div>
+  </div>
+  <p style="color:var(--muted)">根身 — one's own embodied faculties — is 不共業所感, manifested by karma that is one's own alone. What your ear did cannot be handed to anyone; only what you made of it can.</p>
+</section>
+
+</main>
+
+<!-- ══ TITLE BLOCK ══════════════════════════════════════════ -->
+<div class="titleblock">
+  <div class="tb tb-wide"><span class="tb-key">Drawing</span><span class="tb-val">Ālaya — general arrangement &amp; schedules</span></div>
+  <div class="tb"><span class="tb-key">Project</span><span class="tb-val">reachlin/alaya</span></div>
+  <div class="tb"><span class="tb-key">Source</span><span class="tb-val">唯識學綱要</span></div>
+  <div class="tb"><span class="tb-key">Rev</span><span class="tb-val">0.5 — phases 1–5</span></div>
+  <div class="tb"><span class="tb-key">Sheets</span><span class="tb-val">4 figs · 2 schedules</span></div>
+  <div class="tb"><span class="tb-key">Verified</span><span class="tb-val">312 tests, first</span></div>
+</div>
+
+</div></div>
