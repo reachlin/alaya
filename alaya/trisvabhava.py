@@ -248,12 +248,18 @@ class ModelExaminer:
                 _MODEL_SYSTEM, [{"role": "user", "content": prompt}], []
             )
             data = json.loads(_json_of(response.text or ""))
-            fabricated = tuple(sorted(str(t).lower() for t in data.get("fabricated", [])))
+            fabricated = tuple(str(t).strip() for t in data.get("fabricated", []) if str(t).strip())
             note = str(data.get("note", ""))
         except Exception:
             return base
 
-        supported = tuple(t for t in base.terms if t not in fabricated)
+        # A model names *phrases* — "I am perceiving its smell" — while support is
+        # measured over single content words. Comparing the two directly matched
+        # nothing, so every term counted as supported and the examination
+        # reported "overlaid (100% of it arose)", a verdict contradicting its own
+        # number. Expand the phrases into words to score, keep them whole to show.
+        disowned = {w for phrase in fabricated for w in terms_of(phrase)}
+        supported = tuple(t for t in base.terms if t not in disowned)
         support = len(supported) / len(base.terms) if base.terms else 0.0
         if not supported:
             verdict = Verdict.UNFOUNDED

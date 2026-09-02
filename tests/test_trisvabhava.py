@@ -201,3 +201,43 @@ def test_the_residue_stays_readable_when_much_arose(store):
     text = examine("a distinct thing happened, left by my neighbour", g).render()
     assert "and 8 more" in text
     assert text.count("distinct thing number") <= 8
+
+
+def test_a_phrase_the_model_names_reduces_the_support_it_reports(store):
+    """The lexical examiner returns single words; a model returns phrases.
+
+    Counting phrases against a vocabulary of single words matched nothing, so
+    every term stayed 'supported' and the examination reported
+    "overlaid (100% of it arose)" — a verdict contradicting its own number.
+    """
+    g = grounds(store, "bread baking in the kitchen")
+
+    class Fake:
+        name = "fake"
+        deliberative = True
+
+        def converse(self, system, messages, tools):
+            from alaya.providers import Response
+            return Response(text='{"fabricated": ["I am perceiving its smell"], "note": ""}')
+
+    result = ModelExaminer(Fake()).examine(
+        "there is bread baking and I am perceiving its smell", g)
+    assert result.verdict is Verdict.OVERLAID
+    assert result.support < 1.0
+    assert "I am perceiving its smell" in result.fabricated
+
+
+def test_a_model_naming_nothing_still_reports_full_support(store):
+    g = grounds(store, "bread baking in the kitchen")
+
+    class Fake:
+        name = "fake"
+        deliberative = True
+
+        def converse(self, system, messages, tools):
+            from alaya.providers import Response
+            return Response(text='{"fabricated": [], "note": "restates the grounds"}')
+
+    result = ModelExaminer(Fake()).examine("bread baking in the kitchen", g)
+    assert result.verdict is Verdict.DEPENDENT
+    assert result.support == 1.0

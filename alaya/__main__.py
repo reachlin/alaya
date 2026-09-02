@@ -1,7 +1,8 @@
 """``python -m alaya`` — start the stream with a console attached.
 
     python -m alaya                       offline: no API key, echo provider
-    python -m alaya --provider deepseek   a real sixth consciousness (DEEPSEEK_API_KEY)
+    python -m alaya --provider deepseek   a real sixth consciousness (DEEPSEEK_API_KEY,
+                                         read from ./.env if it is there)
     python -m alaya --provider ollama     a local one — no key, nothing leaves the machine
     python -m alaya --no-eye --no-ear     injection only, no hardware
     python -m alaya --say                 speak aloud through macOS `say`
@@ -17,13 +18,14 @@ from pathlib import Path
 from alaya.common import Commons
 from alaya.console import Console
 from alaya.directive import Directive
+from alaya.env import find_env, load_env
 from alaya.identity import Identity
 from alaya.manas import Manas
 from alaya.mano import Mano
 from alaya.providers import build
 from alaya.seeds import SeedStore
 from alaya.senses import DormantFaculty, Ear, Eye, Sense, SenseField
-from alaya.trisvabhava import RopeSnake
+from alaya.trisvabhava import ModelExaminer, RopeSnake, TermExaminer
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -51,24 +53,6 @@ def whisper_transcriber():
     return transcribe
 
 
-def _load_env(path: Path) -> None:
-    """Read KEY=value lines into the environment. Existing values win.
-
-    Deliberately not python-dotenv: this is six lines, and a credential loader
-    is a poor place to acquire a dependency.
-    """
-    if not path.exists():
-        raise SystemExit(f"no such env file: {path}")
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        key, value = key.strip(), value.strip().strip("\"'")
-        if value and key not in os.environ:
-            os.environ[key] = value
-
-
 def main() -> None:
     ap = argparse.ArgumentParser(prog="alaya", description="八識 — one stream, eight functions")
     ap.add_argument("--provider", default="echo",
@@ -77,7 +61,7 @@ def main() -> None:
     ap.add_argument("--base-url", default=None,
                     help="any OpenAI-compatible endpoint (vLLM, Together, a proxy)")
     ap.add_argument("--env", default=None,
-                    help="load API keys from this .env file before starting")
+                    help="load API keys from this file (default: ./.env if present)")
     ap.add_argument("--store", default=str(ROOT / "data" / "seeds.jsonl"))
     ap.add_argument("--identity", default=str(ROOT / "config" / "identity.yaml"))
     ap.add_argument("--no-eye", action="store_true", help="no camera")
@@ -87,12 +71,22 @@ def main() -> None:
     ap.add_argument("--commons", default=None,
                     help="共業 — path to a shared world file two or more agents point at")
     ap.add_argument("--name", default="alaya", help="this agent's name in the shared world")
+    ap.add_argument("--examiner", default="term", choices=["term", "model"],
+                    help="绳蛇检验: 'term' is lexical, free and blunt; 'model' judges "
+                         "implication but costs a call per examination")
     ap.add_argument("--strict", action="store_true",
                     help="绳蛇检验 refuses outward acts that rest on nothing that arose")
     args = ap.parse_args()
 
+    # A .env beside the project loads without being asked for. Anything already
+    # exported in the shell still wins over it.
     if args.env:
-        _load_env(Path(args.env).expanduser())
+        try:
+            load_env(args.env)
+        except FileNotFoundError as exc:
+            raise SystemExit(str(exc))
+    elif (found := find_env()):
+        load_env(found)
 
     store = SeedStore(args.store)
     manas = Manas(store, path=Path(args.store).parent / "manas.md")
@@ -110,14 +104,21 @@ def main() -> None:
         if args.say:
             subprocess.Popen(["say", text])
 
+    provider = build(args.provider, args.model, args.base_url)
+    # The lexical examiner cannot see that "dark" follows from "luminance 0.02",
+    # and on discursive prose it reports half the sentence as fabricated. The
+    # model examiner judges implication instead — at one call per examination,
+    # which is why it is opt-in rather than the default.
+    examiner = ModelExaminer(provider) if args.examiner == "model" else TermExaminer()
+
     mano = Mano(
         store=store,
-        provider=build(args.provider, args.model, args.base_url),
+        provider=provider,
         senses=senses,
         manas=manas,
         identity=Identity.load(args.identity),
         speaker=say,
-        gate=RopeSnake(strict=args.strict),
+        gate=RopeSnake(examiner=examiner, strict=args.strict),
         directive=Directive(Path(args.store).parent / "directive.md"),
     )
     commons = Commons(args.commons) if args.commons else None

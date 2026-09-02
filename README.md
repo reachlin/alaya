@@ -48,7 +48,7 @@ rule carries the reason it takes the shape it does.
 | 4 · Turning | 轉識成智 — online 六七, offline 五八, consolidation | **shipped** |
 | 5 · Surface | Docker, a runnable reference agent, 共業 across agents | **shipped** |
 
-**302 tests**, tests-first throughout.
+**312 tests**, tests-first throughout.
 
 ---
 
@@ -116,16 +116,35 @@ python -m alaya --base-url http://host:8000/v1 --provider openai --model my-mode
 | `openai` | `gpt-4o` | `OPENAI_API_KEY` |
 | `ollama` | `qwen2.5:7b` | none — expects Ollama on `localhost:11434` |
 
-Keys are read from the environment. `--env <path>` loads a `KEY=value` file first, so a key
-kept outside the repo stays outside it:
+Keys come from the environment. A `.env` beside the project loads automatically; `--env <path>`
+points elsewhere. Anything already exported in the shell always wins over a file, an empty
+value is never treated as a setting, and a missing key fails immediately naming the variable
+to set rather than surfacing an SDK error twenty minutes later.
 
 ```bash
-export DEEPSEEK_API_KEY=...              # or
-python -m alaya --provider deepseek --env ~/keys.env
+echo 'DEEPSEEK_API_KEY=...' >> .env       # gitignored
+python -m alaya --provider deepseek
 ```
 
-Existing environment variables always win over the file, and a missing key fails immediately
-naming the variable to set rather than surfacing an SDK error twenty minutes later.
+### Which examiner runs the gate
+
+```bash
+python -m alaya --provider deepseek --examiner model
+```
+
+`term` (default) is lexical, free and blunt. It cannot see that "dark" follows from
+"luminance 0.02", and against a real model's discursive prose it reports half the sentence
+as fabricated — safe, but noisy enough to bury the signal.
+
+`model` judges implication, at one call per examination. On the same claim:
+
+```
+term    遍計所執: already, arose, arrived, body, bore, cannot, caused, claim,
+                  detected, knew, named, percept, signal
+model   遍計所執: i am perceiving its smell
+        note: grounds only state bread baking; perceiving smell is an added
+              subjective claim not borne by the given grounds
+```
 
 Anything OpenAI-compatible works through `--base-url`, including vLLM, Together, and local
 proxies. `deepseek-reasoner` is selectable with `--model` but does not support tool calling on
